@@ -2,6 +2,7 @@
 var crypto = require('crypto')
 var pull   = require('pull-stream')
 
+exports = 
 module.exports = function (opts, cb) {
   if(!cb) cb = opts, opts = {}
   opts = opts || {}
@@ -16,4 +17,4 @@ module.exports = function (opts, cb) {
   }))
 }
 
-
+exports.hash = exports
