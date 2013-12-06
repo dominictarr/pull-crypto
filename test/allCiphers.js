@@ -1,7 +1,7 @@
-var crypt = require('../encodedecode.js'),
+var cryptoStreams = require('../index.js'),
+	encoder = cryptoStreams.encoder,
+	decoder = cryptoStreams.decoder,
 	c = require('crypto'),
-	encoder = crypt.encoder,
-	decoder = crypt.decoder,
 	pull = require('pull-stream'),
 	tape = require('tape'),
 	errors = []
@@ -16,7 +16,7 @@ process.on('uncaughtException', function(err) {
 tape('encode and decode using all ciphers available', function(t) {
 	var vals = ['one', 'two', 'three', 'four']
 	var ciphers = c.getCiphers()
-	var blacklist = ['aes-128-xts', 'aes-256-xts']
+	var blacklist = ['aes-128-xts', 'aes-256-xts', 'des-ede3-cfb1']
 
 	ciphers.forEach(function(ciph, i) {
 		var opts = {
@@ -43,8 +43,12 @@ tape('encode and decode using all ciphers available', function(t) {
 					errors.push(errObj)
 					return
 				} else {
+					t.equal(vals.join(''), result[0], "Results should be the same as original values before encoding for Cipher : " + ciph)
 					if (ciphers.length -1 === i) {
-							t.end()
+						errors.forEach(function(e) {
+							console.dir(e)
+						})
+						t.end()
 					}
 				}
 			})
