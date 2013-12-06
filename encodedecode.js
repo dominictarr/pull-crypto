@@ -35,9 +35,8 @@ exports.encoder = function cryptoStreamEncode(opts) {
 			})
 		}
 	})
-	return encode(function(data) {
-		console.log("Ill never be called")
-	})
+	return encode()
+
 }
 
 exports.decoder = function cryptoStreamDecode(opts) {
@@ -72,7 +71,5 @@ exports.decoder = function cryptoStreamDecode(opts) {
 			})
 		}
 	})
-	return decode(function(data) {
-		console.log("Ill never be called")
-	})
+	return decode()
 }
