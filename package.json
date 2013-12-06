@@ -8,10 +8,12 @@
     "url": "git://github.com/dominictarr/pull-crypto.git"
   },
   "dependencies": {
-    "pull-stream": "2"
+    "pull-stream": "2",
+    "bops": "~0.1.1"
   },
   "devDependencies": {
-    "tape": "~1.0.2"
+    "tape": "~1.0.2",
+    "stream-to-pull-stream": "~1.2.3"
   },
   "scripts": {
     "test": "set -e; for t in test/*.js; do node $t; done"
