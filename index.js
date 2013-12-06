@@ -2,6 +2,7 @@
 var crypto = require('crypto')
 var pull   = require('pull-stream')
 var cryptoStreams = require('./encodedecode.js')
+var bops = require('bops')
 var cryptoStreamEncode = cryptoStreams.encoder
 var cryptoStreamDecode = cryptoStreams.decoder
 
