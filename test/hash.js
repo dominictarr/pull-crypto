@@ -1,5 +1,5 @@
 
-var hash = require('../')
+var hash = require('../index.js').hash
 var pull = require('pull-stream')
 require('tape')('abc', function (t) {
 pull(
