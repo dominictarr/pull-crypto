@@ -18,5 +18,4 @@ tape('encode then pipe to decode then pipe to collect values', function(t) {
 			t.equal(vals.join(''), result[0], "Values should be same after being encrypted and then decrypted")
 		})
 	)
-
 })

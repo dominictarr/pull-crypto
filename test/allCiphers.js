@@ -6,10 +6,6 @@ var cryptoStreams = require('../index.js'),
 	tape = require('tape'),
 	errors = []
 
-process.on('uncaughtException', function(err) {
-	console.log(err)
-})
-
 // This test runs all the ciphers available on your system
 // All the ciphers do not work on my system so this test only shows the errors
 // not sure if this is a bug with node's crypto or if I'm doing something wrong
