@@ -3,7 +3,7 @@ var crypto = require('crypto'),
 	bops = require('bops')
 
 
-function cryptoStreamEncode(opts) {
+exports.encoder = function cryptoStreamEncode(opts) {
 	if (!opts.password) throw new Error("Must supply password")
 	var alg = opts.algorithm || 'aes-256-cbc'
 	var enc = opts.encoding || 'hex'
@@ -40,7 +40,7 @@ function cryptoStreamEncode(opts) {
 	})
 }
 
-function cryptoStreamDecode(opts) {
+exports.decoder = function cryptoStreamDecode(opts) {
 	if (!opts.password) throw new Error("Must supply password")
 	var alg = opts.algorithm || 'aes-256-cbc'
 	var enc = opts.encoding || 'hex'
@@ -75,29 +75,4 @@ function cryptoStreamDecode(opts) {
 	return decode(function(data) {
 		console.log("Ill never be called")
 	})
-}
-
-
-exports.encoder = function (opts, cb) {
-  if(cb)
-    return pull(
-      cryptoStreamEncode(opts),
-      pull.collect(function (err, ary) {
-        if(err) cb(err)
-        else   cb(null, bops.join(ary))
-      })
-    )
-    return cryptoStreamEncode(opts)
-}
-
-exports.decoder = function (opts, cb) {
-  if(cb)
-    return pull(
-      cryptoStreamDecode(opts),
-      pull.collect(function (err, ary) {
-        if(err) cb(err)
-        else   cb(null, bops.join(ary))
-      })
-    )
-    return cryptoStreamDecode(opts)
 }

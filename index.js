@@ -1,9 +1,11 @@
 
 var crypto = require('crypto')
 var pull   = require('pull-stream')
+var cryptoStreams = require('./encodedecode.js')
+var cryptoStreamEncode = cryptoStreams.encoder
+var cryptoStreamDecode = cryptoStreams.decoder
 
-exports = 
-module.exports = function (opts, cb) {
+exports.hash = function (opts, cb) {
   if(!cb) cb = opts, opts = {}
   opts = opts || {}
   var alg = opts.algorithm || 'sha1'
@@ -20,4 +22,26 @@ module.exports = function (opts, cb) {
   )
 }
 
-exports.hash = exports
+exports.encoder = function (opts, cb) {
+  if(cb)
+    return pull(
+      cryptoStreamEncode(opts),
+      pull.collect(function (err, ary) {
+        if(err) cb(err)
+        else   cb(null, bops.join(ary))
+      })
+    )
+    return cryptoStreamEncode(opts)
+}
+
+exports.decoder = function (opts, cb) {
+  if(cb)
+    return pull(
+      cryptoStreamDecode(opts),
+      pull.collect(function (err, ary) {
+        if(err) cb(err)
+        else   cb(null, bops.join(ary))
+      })
+    )
+    return cryptoStreamDecode(opts)
+}
