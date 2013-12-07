@@ -16,7 +16,6 @@ exports.encoder = function cryptoStreamEncode(opts) {
 		var sent = false;
 		return function (end, cb) {
 			read(end, function next(end, data) {
-				console.log("ENCODE CHUNK")
 				if (end === true && sent === false) {
 					sent = true;
 					try {
@@ -53,7 +52,6 @@ exports.decoder = function cryptoStreamDecode(opts) {
 		var sent = false;
 		return function (end, cb) {
 			read(end, function next(end, data) {
-				console.log("DECODE CHUNK")
 				if (end === true && sent === false) {
 					sent = true;
 					try {
