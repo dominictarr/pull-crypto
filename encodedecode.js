@@ -6,7 +6,6 @@ var crypto = require('crypto'),
 exports.encoder = function cryptoStreamEncode(opts) {
 	if (!opts.password) throw new Error("Must supply password")
 	if (!opts.encrypt) opts.encrypt = {}
-	if (!opts.decrypt) opts.decrypt = {}
 	var alg = opts.algorithm || 'aes-256-cbc'
 	var ine = (opts.encrypt.inputEncoding === undefined ? 'utf8' : opts.encrypt.inputEncoding)
 	var enc = (opts.encrypt.encoding === undefined ? 'hex' : opts.encrypt.encoding)
@@ -43,6 +42,7 @@ exports.encoder = function cryptoStreamEncode(opts) {
 
 exports.decoder = function cryptoStreamDecode(opts) {
 	if (!opts.password) throw new Error("Must supply password")
+	if (!opts.decrypt) opts.decrypt = {}
 	var alg = opts.algorithm || 'aes-256-cbc'
 	var ine = (opts.decrypt.inputEncoding === undefined ? 'hex' : opts.decrypt.inputEncoding)
 	var enc = (opts.decrypt.encoding === undefined ? 'utf8' : opts.decrypt.encoding)
