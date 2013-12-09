@@ -12,6 +12,7 @@ var cryptoStreams = require('../index.js'),
 
 
 var ciphers = [
+  'aes-256-cbc',
   'aes128', 'aes192', 'aes256', 'bf', 'blowfish', 'cast', 'des', 'des3', 'desx', 'idea', 'rc2', 'seed'
 ]
 
