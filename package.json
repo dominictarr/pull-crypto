@@ -14,7 +14,7 @@
   "devDependencies": {
     "tape": "~1.0.2",
     "stream-to-pull-stream": "~1.2.3",
-    "hypterquest" : "~0.1.8"
+    "hyperquest" : "~0.1.8"
   },
   "scripts": {
     "test": "set -e; for t in test/*.js; do node $t; done"
