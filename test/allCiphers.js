@@ -10,9 +10,8 @@ var cryptoStreams = require('../index.js'),
 // All the ciphers do not work on my system so this test only shows the errors
 // not sure if this is a bug with node's crypto or if I'm doing something wrong
 tape('encode and decode using all ciphers available', function(t) {
-  var vals = ['one', 'two', 'three', 'four']
+  var vals = ['node issue # 6477 told me to make input to xts more than 16bytes so that is what i am doing so this should work']
   var ciphers = c.getCiphers()
-  var blacklist = ['aes-128-xts', 'aes-256-xts', 'des-ede3-cfb1']
 
   ciphers.forEach(function(ciph, i) {
     opts = {
@@ -27,12 +26,6 @@ tape('encode and decode using all ciphers available', function(t) {
       password : 'secret',
       algorithm : ciphers[i]
     };
-    
-    // the blacklisted algorithms give me a Max Call Stack error
-    // so I need to skip them
-    if (blacklist.indexOf(opts.algorithm) !== -1 ) {
-      return
-    }
 
     pull(
       pull.values(vals),
