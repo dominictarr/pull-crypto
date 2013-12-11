@@ -45,7 +45,7 @@ var opts = {
    
 pull(
   pull.values(['a', 'b', 'c']),
-  pc.encoder(opts),
+  pc.encrypt(opts),
   pull.log()
 )
 ```
@@ -68,7 +68,7 @@ var opts = {
 }
    
 pull.values(['a', 'b', 'c'])
-  .pipe(pc.encoder(opts, function(err, encrypted) {
+  .pipe(pc.encrypt(opts, function(err, encrypted) {
     if (err) throw err
     console.log(encrypted)
   }))
@@ -86,11 +86,11 @@ var opts = {
 }
    
 pull.values(['9f6199ceee0c2a6f36137fa80eeb2a59'])
-  .pipe(pc.decoder(opts))
+  .pipe(pc.decrypt(opts))
   .pipe(pull.log())
 ```
 
-You can also pass a callback to the `decoder` as shown above with the `encoder` example.
+You can also pass a callback to `decrypt` as shown above with the `encrypt` example.
 
 ### algorithms
 

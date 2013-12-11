@@ -22,7 +22,8 @@ exports.hash = function (opts, cb) {
     })
   )
 }
-
+exports.encypher =
+exports.ecrypt =
 exports.encoder = function (opts, cb) {
   if(cb)
     return pull(
@@ -34,7 +35,8 @@ exports.encoder = function (opts, cb) {
     )
     return cryptoStreamEncode(opts)
 }
-
+exports.decypher = 
+exports.decrypt =
 exports.decoder = function (opts, cb) {
   if(cb)
     return pull(
