@@ -3,7 +3,7 @@ var crypto = require('crypto'),
   bops = require('bops')
 
 
-exports.encoder = function cryptoStreamEncode(opts) {
+exports.encypher = function cryptoStreamEncypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.encrypt) opts.encrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
@@ -11,7 +11,7 @@ exports.encoder = function cryptoStreamEncode(opts) {
   var enc = (opts.encrypt.encoding === undefined ? 'hex' : opts.encrypt.encoding)
   var cipher = crypto.createCipher(alg, opts.password)
   var cipherTxt = '';
-  var encode = pull.Through(function (read) {
+  var encrypt = pull.Through(function (read) {
     var sent = false;
     return function (end, cb) {
       read(end, function next(end, data) {
@@ -36,11 +36,11 @@ exports.encoder = function cryptoStreamEncode(opts) {
       })
     }
   })
-  return encode()
+  return encrypt()
 
 }
 
-exports.decoder = function cryptoStreamDecode(opts) {
+exports.decypher = function cryptoStreamDecypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.decrypt) opts.decrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
@@ -48,7 +48,7 @@ exports.decoder = function cryptoStreamDecode(opts) {
   var enc = (opts.decrypt.encoding === undefined ? 'utf8' : opts.decrypt.encoding)
   var decipher = crypto.createDecipher(alg, opts.password)
   var plainTxt = '';
-  var decode = pull.Through(function (read) {
+  var decrypt = pull.Through(function (read) {
     var sent = false;
     return function (end, cb) {
       read(end, function next(end, data) {
@@ -73,5 +73,5 @@ exports.decoder = function cryptoStreamDecode(opts) {
       })
     }
   })
-  return decode()
+  return decrypt()
 }
