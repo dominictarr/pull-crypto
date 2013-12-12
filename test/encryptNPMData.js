@@ -1,6 +1,6 @@
 var cryptoStreams = require('../index.js'),
-  encoder = cryptoStreams.encoder,
-  decoder = cryptoStreams.decoder,
+  encrypt = cryptoStreams.encrypt,
+  decrypt = cryptoStreams.decrypt,
   pull = require('pull-stream'),
   toPull = require('stream-to-pull-stream'),
   tape = require('tape'),
@@ -17,7 +17,7 @@ var cryptoStreams = require('../index.js'),
     password : 'secret',
   };
 
-tape('encode and decode multi chunk network data source', function(t) {
+tape('encrypt and decrypt multi chunk network data source', function(t) {
   var fromNPM = '',
       afterDecrypt = ''
   t.plan(1)
@@ -26,8 +26,8 @@ tape('encode and decode multi chunk network data source', function(t) {
       fromNPM = result.toString()
       pull(
         pull.values([fromNPM]),
-        encoder(opts),
-        decoder(opts, function(err, result) {
+        encrypt(opts),
+        decrypt(opts, function(err, result) {
           if (err) throw err
           afterDecrypt = result
           t.equal(fromNPM, afterDecrypt, "Result collected from Registry should match decrypted text")

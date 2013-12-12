@@ -1,6 +1,6 @@
 var cryptoStreams = require('../index.js'),
-  encoder = cryptoStreams.encoder,
-  decoder = cryptoStreams.decoder,
+  encrypt = cryptoStreams.encrypt,
+  decrypt = cryptoStreams.decrypt,
   pull = require('pull-stream'),
   tape = require('tape'),
   opts = {
@@ -15,13 +15,13 @@ var cryptoStreams = require('../index.js'),
     password : 'secret',
   };
 
-tape('encode then pipe to decode then pipe to collect values', function(t) {
+tape('ecrypt then pipe to decrypt then pipe to collect values', function(t) {
   t.plan(1)
   var vals = ['one', 'two', 'three', 'four']
   pull(
     pull.values(vals),
-    encoder(opts),
-    decoder(opts),
+    encrypt(opts),
+    decrypt(opts),
     pull.collect(function(err, result) {
       t.equal(vals.join(''), result[0], "Values should be same after being encrypted and then decrypted")
     })

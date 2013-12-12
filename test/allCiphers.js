@@ -1,14 +1,10 @@
 var cryptoStreams = require('../index.js'),
-  encoder = cryptoStreams.encoder,
-  decoder = cryptoStreams.decoder,
+  encrypt = cryptoStreams.encrypt,
+  decrypt = cryptoStreams.decrypt,
   c = require('crypto'),
   pull = require('pull-stream'),
   tape = require('tape'),
   errors = []
-
-// This test runs all the ciphers available on your system
-// All the ciphers do not work on my system so this test only shows the errors
-// not sure if this is a bug with node's crypto or if I'm doing something wrong
 
 
 var ciphers = [
@@ -16,11 +12,9 @@ var ciphers = [
   'aes128', 'aes192', 'aes256', 'bf', 'blowfish', 'cast', 'des', 'des3', 'desx', 'idea', 'rc2', 'seed'
 ]
 
-//c.getCiphers()
-
 ciphers.forEach(function(ciph, i) {
 
-tape('encode and decode using ' + ciph, function(t) {
+tape('encrypt and decrypt using ' + ciph, function(t) {
   var vals = ['node issue # 6477 told me to make input to xts',
               'more than 16bytes so that is what i am doing so this should work']
 
@@ -39,8 +33,8 @@ tape('encode and decode using ' + ciph, function(t) {
 
     pull(
       pull.values(vals),
-      encoder(opts),
-      decoder(opts),
+      encrypt(opts),
+      decrypt(opts),
       pull.collect(function(err, result) {
         if (err) {
           t.notOk(err === null, "Failed while trying cipher : " + ciph)
@@ -49,7 +43,7 @@ tape('encode and decode using ' + ciph, function(t) {
             cipher : ciphers[i]
           }
         } else {
-          t.equal(vals.join(''), result[0], "Results should be the same as original values before encoding for Cipher : " + ciph)
+          t.equal(vals.join(''), result[0], "Results should be the same as original values before encrypting for Cipher : " + ciph)
             t.end()
         }
       })

@@ -23,7 +23,7 @@ exports.hash = function (opts, cb) {
   )
 }
 exports.encypher =
-exports.ecrypt = function (opts, cb) {
+exports.encrypt = function (opts, cb) {
   if(cb)
     return pull(
       encypher(opts),
