@@ -1,9 +1,12 @@
 
 var crypto = require('crypto')
 var pull   = require('pull-stream')
+var cryptoStreams = require('./encryptdecrypt.js')
+var bops = require('bops')
+var encypher = cryptoStreams.encypher
+var decypher = cryptoStreams.decypher
 
-exports = 
-module.exports = function (opts, cb) {
+exports.hash = function (opts, cb) {
   if(!cb) cb = opts, opts = {}
   opts = opts || {}
   var alg = opts.algorithm || 'sha1'
@@ -19,5 +22,27 @@ module.exports = function (opts, cb) {
     })
   )
 }
-
-exports.hash = exports
+exports.encypher =
+exports.encrypt = function (opts, cb) {
+  if(cb)
+    return pull(
+      encypher(opts),
+      pull.collect(function (err, ary) {
+        if(err) cb(err)
+        else   cb(null, bops.join(ary))
+      })
+    )
+    return encypher(opts)
+}
+exports.decypher = 
+exports.decrypt = function (opts, cb) {
+  if(cb)
+    return pull(
+      decypher(opts),
+      pull.collect(function (err, ary) {
+        if(err) cb(err)
+        else   cb(null, bops.join(ary))
+      })
+    )
+    return decypher(opts)
+}
