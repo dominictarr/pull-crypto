@@ -3,8 +3,7 @@ var cryptoStreams = require('../index.js'),
   decrypt = cryptoStreams.decrypt,
   c = require('crypto'),
   pull = require('pull-stream'),
-  tape = require('tape'),
-  errors = []
+  tape = require('tape')
 
 
 var ciphers = [
@@ -38,10 +37,6 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
       pull.collect(function(err, result) {
         if (err) {
           t.notOk(err === null, "Failed while trying cipher : " + ciph)
-          var errObj = {
-            error : err,
-            cipher : ciphers[i]
-          }
         } else {
           t.equal(vals.join(''), result[0], "Results should be the same as original values before encrypting for Cipher : " + ciph)
             t.end()
