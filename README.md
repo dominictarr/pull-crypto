@@ -72,7 +72,7 @@ pull.values(['a', 'b', 'c'])
 
 ## decrypt
 
-this is the same as encrypt. It can either be piped down stream or take a callback. Below we take encrypted `base64` data and pipe it to the `decoder` and then print out the decrypted data to the console, which yields `abc`.
+this is the same as encrypt. It can either be piped down stream or take a callback. Below we take encrypted `base64` data and pipe it to `decrypt` and then print out the decrypted data to the console, which yields `abc`.
 
 ```js
 var pc = require('pull-crypto')
