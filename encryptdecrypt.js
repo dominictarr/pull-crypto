@@ -7,8 +7,8 @@ exports.encypher = function cryptoStreamEncypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.encrypt) opts.encrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.encrypt.inputEncoding === undefined ? 'ascii' : opts.encrypt.inputEncoding)
-  var enc = (opts.encrypt.encoding === undefined ? 'ascii' : opts.encrypt.encoding)
+  var ine = (opts.encrypt.inputEncoding === undefined ? undefined : opts.encrypt.inputEncoding)
+  var enc = (opts.encrypt.encoding === undefined ? undefined : opts.encrypt.encoding)
   var cipher = crypto.createCipher(alg, opts.password);
   var encrypt = pull.Through(function (read) {
     var sent = false,
@@ -44,7 +44,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
               }
               last.len = last.length
               buffers.push(last)
-              all = bops.join(buffers)
+              all = bops.join(buffers, enc)
               sent = true
               cb(false, all)
             } else {
@@ -71,8 +71,8 @@ exports.decypher = function cryptoStreamDecipher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.decrypt) opts.decrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.decrypt.inputEncoding === undefined ? 'ascii' : opts.decrypt.inputEncoding)
-  var enc = (opts.decrypt.encoding === undefined ? 'ascii' : opts.decrypt.encoding)
+  var ine = (opts.decrypt.inputEncoding === undefined ? undefined : opts.decrypt.inputEncoding)
+  var enc = (opts.decrypt.encoding === undefined ? undefined : opts.decrypt.encoding)
   var decipher = crypto.createDecipher(alg, opts.password);
   var decrypt = pull.Through(function (read) {
     var sent = false,
@@ -108,7 +108,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
               }
               last.len = last.length
               buffers.push(last)
-              all = bops.join(buffers)
+              all = bops.join(buffers, enc)
               sent = true
               cb(false, all)
             } else {
