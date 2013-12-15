@@ -27,15 +27,17 @@ tape('read file 2 times and collect encrypted text and check it it matches', fun
     })
   )
   thisFile.on('end', function() {
-    toPull(fs.createReadStream(__filename))
-      .pipe(encrypt(opts))
-      .pipe(decrypt(opts))
-      .pipe(pull.collect(function(err, b) {
+    pull(
+      toPull(fs.createReadStream(__filename)),
+      encrypt(opts),
+      decrypt(opts),
+      pull.collect(function(err, b) {
         if (err) throw err
         encrypted2 = Buffer.concat(b, totalLength(b))
         t.ok(Buffer.isBuffer(encrypted2), "Should be buffer")
         t.equal(encrypted1.toString('utf8'), encrypted2.toString('utf8'), "Both should be equal")
-      }))
+      })
+    )
   })
 })
 

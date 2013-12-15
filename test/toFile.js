@@ -21,22 +21,24 @@ var cryptoStreams = require('../index.js'),
 
 tape('read file then encrypt data write encrypted data to file decrypt encrypted file data', function(t) {
   t.plan(1)
-  toPull(thisFile)
-    .pipe(encrypt(opts))
-    .pipe(toPull(writeStream))
-
+  pull(
+    toPull(thisFile),
+    encrypt(opts),
+    toPull(writeStream)
+  )
   writeStream.on('close', function() {
     pull(
       toPull(fs.createReadStream('./output.txt', {encoding : 'ascii'})),
       decrypt(opts, function(err, result) {
         if (err) throw err
-        toPull(fs.createReadStream(__filename))
-          .pipe(pull.collect(function(err, file) {
-            if (err) throw err
+        pull(
+          toPull(fs.createReadStream(__filename)),
+          pull.collect(function(err, file) {
             t.equal(file.join(''), result, "File data should be same as the result of decrypting the encrypted file data we just wrote")
             // clean up
             fs.unlinkSync('./output.txt')
-          }))
+          })
+        )
       })
     )
   })

@@ -12,22 +12,25 @@ var cryptoStreams = require('../index.js'),
 
 tape('buffer in string out', function(t) {
   t.plan(3)
-  pull.values([new Buffer('buffer goes in and string comes out')])
-    .pipe(encrypt(opts))
-    .pipe(pull.collect(function(err, r) {
+  pull(
+    pull.values([new Buffer('buffer goes in and string comes out')]),
+    encrypt(opts),
+    pull.collect(function(err, r) {
       if (err) throw err
       var encrypted = (Buffer.isBuffer(r[0]) === true ? Buffer.concat(r, totalLength(r)) : r.join(''))
       t.equal(Buffer.isBuffer(encrypted), true, "Should receive buffer after encryption")
-      pull.values([encrypted])
-        .pipe(decrypt(opts))
-        .pipe(pull.collect(function(err, d) {
+      pull(
+        pull.values([encrypted]),
+        decrypt(opts),
+        pull.collect(function(err, d) {
           if (err) throw err
-          console.log("Received back from decrypt, a buffer? " + Buffer.isBuffer(d))
           var decrypted = d.join('')
           t.equal(Buffer.isBuffer(decrypted), false, "Should receive string after decryption")
           t.equal('buffer goes in and string comes out', decrypted, "original string put into buffer should match the decrypted text")
-        }))
-    }))
+        })
+      )
+    })
+  )
 })
 
 function totalLength(buffArray) {

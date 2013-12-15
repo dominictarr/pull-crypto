@@ -61,16 +61,19 @@ var pc = require('pull-crypto')
 var pull = require('pull-stream')
 var opts = {
   password : 'secret',
-  decrypt : {
-    encoding : 'utf8'
+  encrypt : {
+    inputEncoding : 'ascii',
+    encoding : 'hex'
   }
 }
    
-pull.values(['a', 'b', 'c'])
-  .pipe(pc.encrypt(opts, function(err, encrypted) {
+pull(
+  pull.values(['a', 'b', 'c']),
+  pc.encrypt(opts, function(err, encrypted) {
     if (err) throw err
     console.log(encrypted)
-  }))
+  })
+)
 ```
 
 ## decrypt
@@ -82,17 +85,17 @@ var pc = require('pull-crypto')
 var pull = require('pull-stream')
 var opts = {
   password : 'secret',
-  encrypt : {
-    encoding : 'hex'
-  },
   decrypt : {
+    inputEncoding : 'hex',
     encoding : 'utf8'
   }
 }
    
-pull.values(['9f6199ceee0c2a6f36137fa80eeb2a59'])
-  .pipe(pc.decrypt(opts))
-  .pipe(pull.log())
+pull(
+  pull.values(['9f6199ceee0c2a6f36137fa80eeb2a59']),
+  pc.decrypt(opts),
+  pull.log()
+)
 ```
 
 You can also pass a callback to `decrypt` as shown above with the `encrypt` example.

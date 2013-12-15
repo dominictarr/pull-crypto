@@ -17,20 +17,23 @@ var cryptoStreams = require('../index.js'),
 
 tape('buffer is default output', function(t) {
   t.plan(3)
-  pull.values(['string in and get string out'])
-    .pipe(encrypt(opts))
-    .pipe(pull.collect(function(err, r) {
+  pull(
+    pull.values(['string in and get string out']),
+    encrypt(opts),
+    pull.collect(function(err, r) {
       if (err) throw err
       var encrypted = (Buffer.isBuffer(r[0]) === true ? Buffer.concat(r, totalLength(r)) : r.join(''))
-      console.dir(r)
       t.equal(Buffer.isBuffer(encrypted), false, "Should not receive buffer back")
-      pull.values([encrypted])
-        .pipe(decrypt(opts))
-        .pipe(pull.collect(function(err, d) {
+      pull(
+        pull.values([encrypted]),
+        decrypt(opts),
+        pull.collect(function(err, d) {
           if (err) throw err
           var decrypted = d.join('')
           t.equal(Buffer.isBuffer(decrypted), false, "Should not receive buffer back from decryption")
           t.equal('string in and get string out', decrypted, "string to string decrypted message should match original messase before encryption")
-        }))
-    }))
+        })
+      )
+    })
+  )
 }) 
