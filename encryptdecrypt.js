@@ -7,7 +7,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.encrypt) opts.encrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.encrypt.inputEncoding === undefined ? undefined : opts.encrypt.inputEncoding)
+  var ine = (opts.encrypt.inputEncoding === undefined ? 'ascii' : opts.encrypt.inputEncoding)
   var enc = (opts.encrypt.encoding === undefined ? undefined : opts.encrypt.encoding)
   var cipher = crypto.createCipher(alg, opts.password);
   var encrypt = pull.Through(function (read) {
@@ -28,6 +28,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
             cb(e)
           }
         } else if (data !== undefined) {
+          enc = (enc === undefined ? 'ascii' : enc)
           try {
             cipherTxt += cipher.update(data, ine, enc)
           } catch (e) {
@@ -71,7 +72,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.decrypt) opts.decrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.decrypt.inputEncoding === undefined ? undefined : opts.decrypt.inputEncoding)
+  var ine = (opts.decrypt.inputEncoding === undefined ? 'base64' : opts.decrypt.inputEncoding)
   var enc = (opts.decrypt.encoding === undefined ? undefined : opts.decrypt.encoding)
   var decipher = crypto.createDecipher(alg, opts.password);
   var decrypt = pull.Through(function (read) {
@@ -92,6 +93,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
             cb(e)
           }
         } else if (data !== undefined) {
+          enc = (enc === undefined ? 'ascii' : enc)
           try {
             plainTxt += decipher.update(data, ine, enc)
           } catch (e) {
