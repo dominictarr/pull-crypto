@@ -32,11 +32,9 @@ var pc = require('pull-crypto')
 var pull = require('pull-stream')
 var opts = {
   encrypt : {
-    inputEncoding : 'utf8',
     encoding : 'base64'
   },
   decrypt : {
-    inputEncoding : 'base64',
     encoding : 'utf8'
   },
   algorithm : 'aes-256-cbc',
@@ -53,10 +51,8 @@ Note : options object is intentionally verbose in above example to show all prop
 
 Options Object defaults :
 * algorithm : `aes-256-cbc`
-* encrypt.inputEncoding : `utf8`
-* encrypt.encoding : `hex`
-* decrypt.inputEncoding : `hex`
-* decrypt.encoding : `utf8`
+* encrypt.encoding : `buffer`
+* decrypt.encoding : `buffer`
 
 Below is same example as above with Callback supplied. It also has a slimmed down options object.
 
@@ -98,7 +94,7 @@ You can choose any algorithm that is available through node's `crypto.getCiphers
 
 ### encoding
 
-Again see node's `crypto` module for details on possible input and output encoding.
+Again see node's `crypto` module for details on encoding.
 
 ## License
 
