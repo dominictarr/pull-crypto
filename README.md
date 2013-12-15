@@ -72,13 +72,19 @@ pull.values(['a', 'b', 'c'])
 
 ## decrypt
 
-this is the same as encrypt. It can either be piped down stream or take a callback. Below we take encrypted `base64` data and pipe it to `decrypt` and then print out the decrypted data to the console, which yields `abc`.
+this is the same as encrypt. It can either be piped down stream or take a callback. Below we take encrypted `hex` data and pipe it to `decrypt` and then print out the decrypted data to the console, which yields `abc`.
 
 ```js
 var pc = require('pull-crypto')
 var pull = require('pull-stream')
 var opts = {
-  password : 'secret'
+  password : 'secret',
+  encrypt : {
+    encoding : 'hex'
+  },
+  decrypt : {
+    encoding : 'utf8'
+  }
 }
    
 pull.values(['9f6199ceee0c2a6f36137fa80eeb2a59'])
@@ -94,7 +100,11 @@ You can choose any algorithm that is available through node's `crypto.getCiphers
 
 ### encoding
 
-Again see node's `crypto` module for details on encoding.
+Please note that the output encoding must be set explicitly. This is very important if you would like to control the output of the encrytion or decryption. You could easily set `opts.encrypt.encoding` to `hex` if you would like to store encrypted data in `hex` format. Likewise you can do the same with your decrypted data if you'd like to store it in something other than `ascii` or `utf8`, i.e. human readable.
+
+If you leave these options blank than it will be defaulted to `buffer`. You can pass in a buffer and get a buffer back as long as you don't set the encoding for either the `encrypt` or `decrypt` methods. You can also pass in a buffer and set the `decrypt` encoding to `utf8` and get back `utf8` data.
+
+See node's [crypto](http://nodejs.org/api/crypto.html#crypto_class_cipher) module for details on encoding.
 
 ## License
 

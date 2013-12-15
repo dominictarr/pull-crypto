@@ -55,6 +55,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
 exports.decypher = function cryptoStreamDecypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.decrypt) opts.decrypt = {}
+  if (!opts.encrypt) opts.encrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
   var ine = (opts.decrypt.inputEncoding === undefined ? 'utf8' : opts.decrypt.inputEncoding)
   var enc = (opts.decrypt.encoding === undefined ? undefined : opts.decrypt.encoding)
@@ -73,7 +74,7 @@ exports.decypher = function cryptoStreamDecypher(opts) {
             buffer.len = buffer.length
             buffers.push(buffer)
           } else {
-            buffer = bops.from(data, opts.encrypt.encoding)
+            buffer = bops.from(data, (opts.encrypt.encoding || 'utf8'))
             buffer.len = buffer.length
             buffers.push(buffer)
           }
