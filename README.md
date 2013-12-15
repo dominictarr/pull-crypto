@@ -60,7 +60,10 @@ Below is same example as above with Callback supplied. It also has a slimmed dow
 var pc = require('pull-crypto')
 var pull = require('pull-stream')
 var opts = {
-  password : 'secret'
+  password : 'secret',
+  decrypt : {
+    encoding : 'utf8'
+  }
 }
    
 pull.values(['a', 'b', 'c'])
