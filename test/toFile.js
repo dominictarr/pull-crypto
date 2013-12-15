@@ -9,9 +9,11 @@ var cryptoStreams = require('../index.js'),
   writeStream = fs.createWriteStream('./output.txt', {encoding : 'ascii'}),
   opts = {
     encrypt : {
+      inputEncoding : 'ascii',
       encoding : 'base64'
     },
     decrypt : {
+      inputEncoding : 'base64',
       encoding : 'ascii'
     },
     password : 'secret',

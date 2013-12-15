@@ -14,6 +14,8 @@ tape('buffer is default output', function(t) {
     .pipe(pull.collect(function(err, r) {
       if (err) throw err
       var encrypted = (Buffer.isBuffer(r[0]) === true ? Buffer.concat(r, totalLength(r)) : r.join(''))
+      console.dir(r)
+      console.dir(encrypted)
       t.equal(Buffer.isBuffer(encrypted), true, "Should receive buffer after encryption")
       pull.values([encrypted])
         .pipe(decrypt(opts))
@@ -24,7 +26,7 @@ tape('buffer is default output', function(t) {
           t.equal('buffer goes in and buffer comes out', decrypted.toString('utf8'), "buffer to string decrypted message should match original messase before encryption")
         }))
     }))
-}) 
+})
 
 function totalLength(buffArray) {
   var total = 0

@@ -5,8 +5,11 @@ var cryptoStreams = require('../index.js'),
   tape = require('tape'),
   opts = {
     password : 'secret',
+    encrypt : {
+      encoding : 'base64'
+    },
     decrypt : {
-      encoding : 'utf8'
+      inputEncoding : 'base64'
     }
   };
 
@@ -15,10 +18,16 @@ tape('ecrypt and decrypt into callback', function(t) {
   var vals = ['one', 'two', 'three', 'four']
   pull(
     pull.values(vals),
-    encrypt(opts),
-    decrypt(opts, function(err, result) {
-        console.dir(result)
-        t.equal(vals.join(''), result, "Values should be same after being encrypted and then decrypted")
+    encrypt(opts, function(err, encrypted) {
+      if (err) throw err
+      console.log("Below is callback")
+      console.dir(encrypted)
+      pull(pull.values([encrypted]), decrypt(opts, function(err, decrypted) {
+        if (err) console.error(err)
+        console.log("Below is callback")
+        console.dir(decrypted)
+        t.equal(vals.join(''), decrypted, "Original values and decrypted values should match")
+      }))
     })
   )
 })

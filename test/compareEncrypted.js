@@ -6,9 +6,9 @@ var cryptoStreams = require('../index.js'),
   tape = require('tape'),
   fs = require('fs'),
   opts = {
-    password : 'secret',
+    password : 'secret'
   };
-  thisFile = fs.createReadStream(__filename, {encoding : 'utf8'});
+  thisFile = fs.createReadStream(__filename);
 
 
 
@@ -23,17 +23,17 @@ tape('read file 2 times and collect encrypted text and check it it matches', fun
     pull.collect(function(err, a) {
       if (err) throw err
       encrypted1 = Buffer.concat(a, totalLength(a))
-      t.ok(encrypted1, "Should not be empty")
+      t.ok(Buffer.isBuffer(encrypted1), "Should be buffer")
     })
   )
   thisFile.on('end', function() {
-    toPull(fs.createReadStream(__filename, {encoding : 'utf8'}))
+    toPull(fs.createReadStream(__filename))
       .pipe(encrypt(opts))
       .pipe(decrypt(opts))
       .pipe(pull.collect(function(err, b) {
         if (err) throw err
         encrypted2 = Buffer.concat(b, totalLength(b))
-        t.ok(encrypted2, "Should not be empty")
+        t.ok(Buffer.isBuffer(encrypted2), "Should be buffer")
         t.equal(encrypted1.toString('utf8'), encrypted2.toString('utf8'), "Both should be equal")
       }))
   })

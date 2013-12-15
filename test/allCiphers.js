@@ -19,10 +19,12 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
 
     opts = {
       encrypt : {
+        inputEncoding : 'ascii',
         encoding : 'base64'
       },
       decrypt : {
-        encoding : 'utf8'
+        inputEncoding : 'base64',
+        encoding : 'ascii'
       },
       password : 'secret',
       algorithm : ciphers[i]

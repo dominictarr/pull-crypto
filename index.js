@@ -40,6 +40,7 @@ exports.decrypt = function (opts, cb) {
     return pull(
       decypher(opts),
       pull.collect(function (err, ary) {
+        console.log("From Index got back : " + ary)
         if(err) cb(err)
         else   cb(null, bops.join(ary))
       })

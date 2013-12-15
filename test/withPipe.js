@@ -8,7 +8,7 @@ var cryptoStreams = require('../index.js'),
       encoding : 'base64'
     },
     decrypt : {
-      encoding : 'utf8'
+      inputEncoding : 'base64'
     },
     password : 'secret',
   };
@@ -21,7 +21,7 @@ tape('ecrypt then pipe to decrypt then pipe to collect values', function(t) {
     encrypt(opts),
     decrypt(opts),
     pull.collect(function(err, result) {
-      t.equal(vals.join(''), result[0], "Values should be same after being encrypted and then decrypted")
+      t.equal(vals.join(''), result.join(''), "Values should be same after being encrypted and then decrypted")
     })
   )
 })

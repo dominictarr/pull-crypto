@@ -1,6 +1,5 @@
 var crypto = require('crypto'),
   pull = require('pull-stream'),
-  toPull = require('stream-to-pull-stream'),
   bops = require('bops')
 
 
@@ -8,12 +7,74 @@ exports.encypher = function cryptoStreamEncypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.encrypt) opts.encrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.encrypt.inputEncoding === undefined ? 'utf8' : opts.encrypt.inputEncoding)
-  var enc = (opts.encrypt.encoding === undefined ? undefined : opts.encrypt.encoding)
-  var encipher = crypto.createCipher(alg, opts.password);
-  (enc !== undefined ? encipher.setEncoding(enc) : '')
-  encipher.pause()
-  var concat = pull.Through(function (read) {
+  var ine = (opts.encrypt.inputEncoding === undefined ? 'ascii' : opts.encrypt.inputEncoding)
+  var enc = (opts.encrypt.encoding === undefined ? 'ascii' : opts.encrypt.encoding)
+  var cipher = crypto.createCipher(alg, opts.password);
+  var encrypt = pull.Through(function (read) {
+    var sent = false,
+        buffers = [],
+        cipherTxt = '',
+        dataType;
+    return function (end, cb) {
+      read(end, function next(end, data) {
+        var buffer
+        if (bops.is(data)) {
+          dataType = 'buffer'
+          try {
+            buffer = new Buffer(cipher.update(data))
+            buffer.len = buffer.length
+            buffers.push(buffer)
+          } catch (e) {
+            cb(e)
+          }
+        } else if (data !== undefined) {
+          try {
+            cipherTxt += cipher.update(data, ine, enc)
+          } catch (e) {
+            cb(e)
+          }
+        }
+        if (end === true && sent === false) {
+            if (dataType === 'buffer') {
+              var last, all
+              try {
+                last = new Buffer(cipher.final())
+              } catch (e) {
+                cb(e)
+              }
+              last.len = last.length
+              buffers.push(last)
+              all = bops.join(buffers)
+              sent = true
+              cb(false, all)
+            } else {
+              try {
+                cipherTxt += cipher.final(enc)
+              } catch (e) {
+                cb(e)
+              }
+              sent = true
+              cb(false, cipherTxt)
+            }
+        } else if (end === true && sent === true) {
+          cb(true)
+        } else if (data !== null) {
+          read(end, next)
+        }
+      })
+    }
+  })
+  return encrypt()
+}
+
+exports.decypher = function cryptoStreamDecipher(opts) {
+  if (!opts.password) throw new Error("Must supply password")
+  if (!opts.decrypt) opts.decrypt = {}
+  var alg = opts.algorithm || 'aes-256-cbc'
+  var ine = (opts.decrypt.inputEncoding === undefined ? 'ascii' : opts.decrypt.inputEncoding)
+  var enc = (opts.decrypt.encoding === undefined ? 'ascii' : opts.decrypt.encoding)
+  var decipher = crypto.createDecipher(alg, opts.password);
+  var decrypt = pull.Through(function (read) {
     var sent = false,
         buffers = [],
         plainTxt = '',
@@ -21,20 +82,41 @@ exports.encypher = function cryptoStreamEncypher(opts) {
     return function (end, cb) {
       read(end, function next(end, data) {
         var buffer
-        if (bops.is(data)) {
+       if (bops.is(data)) {
           dataType = 'buffer'
-          buffer = data
-          buffer.len = buffer.length
-          buffers.push(buffer)
+          try {
+            buffer = new Buffer(decipher.update(data))
+            buffer.len = buffer.length
+            buffers.push(buffer)
+          } catch (e) {
+            cb(e)
+          }
         } else if (data !== undefined) {
-          plainTxt += data
+          try {
+            plainTxt += decipher.update(data, ine, enc)
+          } catch (e) {
+            cb(e)
+          }
         }
         if (end === true && sent === false) {
             if (dataType === 'buffer') {
-              var all = bops.join(buffers)
+              var last, all
+              try {
+                last = new Buffer(decipher.final())
+              } catch (e) {
+                cb(e)
+              }
+              last.len = last.length
+              buffers.push(last)
+              all = bops.join(buffers)
               sent = true
-              cb(false, all)  
+              cb(false, all)
             } else {
+              try {
+                plainTxt += decipher.final(enc)
+              } catch (e) {
+                cb(e)
+              }
               sent = true
               cb(false, plainTxt)
             }
@@ -46,53 +128,5 @@ exports.encypher = function cryptoStreamEncypher(opts) {
       })
     }
   })
-  return pull(
-    concat(),
-    toPull(encipher)
-  )
-}
-
-exports.decypher = function cryptoStreamDecypher(opts) {
-  if (!opts.password) throw new Error("Must supply password")
-  if (!opts.decrypt) opts.decrypt = {}
-  if (!opts.encrypt) opts.encrypt = {}
-  var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.decrypt.inputEncoding === undefined ? 'utf8' : opts.decrypt.inputEncoding)
-  var enc = (opts.decrypt.encoding === undefined ? undefined : opts.decrypt.encoding)
-  var decipher = crypto.createDecipher(alg, opts.password);
-  (enc !== undefined ? decipher.setEncoding(enc) : '')
-  decipher.pause();
-  var concat = pull.Through(function (read) {
-    var sent = false,
-        buffers = []
-    return function (end, cb) {
-      read(end, function next(end, data) {
-        var buffer
-        if (data !== undefined) {
-          if (bops.is(data)) {
-            buffer = data
-            buffer.len = buffer.length
-            buffers.push(buffer)
-          } else {
-            buffer = bops.from(data, (opts.encrypt.encoding || 'utf8'))
-            buffer.len = buffer.length
-            buffers.push(buffer)
-          }
-        }
-        if (end === true && sent === false) {
-            var all = bops.join(buffers)
-            sent = true
-            cb(false, all)
-        } else if (end === true && sent === true) {
-          cb(true)
-        } else if (data !== null) {
-          read(end, next)
-        }
-      })
-    }
-  })
-  return pull(
-    concat(),
-    toPull(decipher)
-  )
+  return decrypt()
 }
