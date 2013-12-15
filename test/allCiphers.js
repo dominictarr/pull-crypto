@@ -19,11 +19,9 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
 
     opts = {
       encrypt : {
-        inputEncoding : 'utf8',
         encoding : 'base64'
       },
       decrypt : {
-        inputEncoding : 'base64',
         encoding : 'utf8'
       },
       password : 'secret',
@@ -38,7 +36,8 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
         if (err) {
           t.notOk(err === null, "Failed while trying cipher : " + ciph)
         } else {
-          t.equal(vals.join(''), result[0], "Results should be the same as original values before encrypting for Cipher : " + ciph)
+          result = (Buffer.isBuffer(result[0]) === true ? Buffer.concat(result, totalLength(result)) : result.join(''))
+          t.equal(vals.join(''), result.toString(), "Results should be the same as original values before encrypting for Cipher : " + ciph)
             t.end()
         }
       })
@@ -46,3 +45,14 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
 
   })
 })
+
+function totalLength(buffArray) {
+  var total = 0
+  buffArray.forEach(function(buff) {
+    if (Buffer.isBuffer(buff)) {
+      total += buff.length
+      return
+    }
+  })
+  return total
+}

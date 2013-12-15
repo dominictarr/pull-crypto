@@ -6,32 +6,35 @@ var cryptoStreams = require('../index.js'),
   tape = require('tape'),
   hq = require('hyperquest'),
   opts = {
-    encrypt : {
-      inputEncoding : 'utf8',
-      encoding : 'base64'
-    },
-    decrypt : {
-      inputEncoding : 'base64',
-      encoding : 'utf8'
-    },
     password : 'secret',
   };
 
 tape('encrypt and decrypt multi chunk network data source', function(t) {
   var fromNPM = '',
-      afterDecrypt = ''
+      afterDecrypt
   t.plan(1)
   toPull(hq('http://registry.npmjs.org/pull-stream'))
-    .pipe(pull.collect(function(err, result) {
-      fromNPM = result.toString()
+    .pipe(pull.collect(function(err, r) {
+      fromNPM = (Buffer.isBuffer(r[0]) === true ? Buffer.concat(r, totalLength(r)) : r.join(''));
       pull(
         pull.values([fromNPM]),
         encrypt(opts),
         decrypt(opts, function(err, result) {
           if (err) throw err
           afterDecrypt = result
-          t.equal(fromNPM, afterDecrypt, "Result collected from Registry should match decrypted text")
+          t.equal(fromNPM.toString(), afterDecrypt.toString(), "Result collected from Registry should match decrypted text")
         })
       )
     }))
 })
+
+function totalLength(buffArray) {
+  var total = 0
+  buffArray.forEach(function(buff) {
+    if (Buffer.isBuffer(buff)) {
+      total += buff.length
+      return
+    }
+  })
+  return total
+}

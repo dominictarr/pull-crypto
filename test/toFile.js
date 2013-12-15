@@ -9,11 +9,9 @@ var cryptoStreams = require('../index.js'),
   writeStream = fs.createWriteStream('./output.txt', {encoding : 'ascii'}),
   opts = {
     encrypt : {
-      inputEncoding : 'ascii',
       encoding : 'base64'
     },
     decrypt : {
-      inputEncoding : 'base64',
       encoding : 'ascii'
     },
     password : 'secret',
@@ -30,10 +28,10 @@ tape('read file then encrypt data write encrypted data to file decrypt encrypted
       toPull(fs.createReadStream('./output.txt', {encoding : 'ascii'})),
       decrypt(opts, function(err, result) {
         if (err) throw err
-        toPull(fs.createReadStream(__filename, {encoding : 'ascii'}))
+        toPull(fs.createReadStream(__filename))
           .pipe(pull.collect(function(err, file) {
             if (err) throw err
-            t.equal(file[0], result, "File data should be same as the result of decrypting the encrypted file data we just wrote")
+            t.equal(file.join(''), result, "File data should be same as the result of decrypting the encrypted file data we just wrote")
             // clean up
             fs.unlinkSync('./output.txt')
           }))

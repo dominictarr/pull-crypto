@@ -4,7 +4,10 @@ var cryptoStreams = require('../index.js'),
   pull = require('pull-stream'),
   tape = require('tape'),
   opts = {
-    password : 'secret'
+    password : 'secret',
+    decrypt : {
+      encoding : 'utf8'
+    }
   };
 
 tape('ecrypt and decrypt into callback', function(t) {
@@ -14,6 +17,7 @@ tape('ecrypt and decrypt into callback', function(t) {
     pull.values(vals),
     encrypt(opts),
     decrypt(opts, function(err, result) {
+        console.log(result)
         t.equal(vals.join(''), result, "Values should be same after being encrypted and then decrypted")
     })
   )
