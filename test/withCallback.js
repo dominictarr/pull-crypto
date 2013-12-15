@@ -17,7 +17,7 @@ tape('ecrypt and decrypt into callback', function(t) {
     pull.values(vals),
     encrypt(opts),
     decrypt(opts, function(err, result) {
-        console.log(result)
+        console.dir(result)
         t.equal(vals.join(''), result, "Values should be same after being encrypted and then decrypted")
     })
   )

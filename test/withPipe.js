@@ -5,11 +5,9 @@ var cryptoStreams = require('../index.js'),
   tape = require('tape'),
   opts = {
     encrypt : {
-      inputEncoding : 'utf8',
       encoding : 'base64'
     },
     decrypt : {
-      inputEncoding : 'base64',
       encoding : 'utf8'
     },
     password : 'secret',

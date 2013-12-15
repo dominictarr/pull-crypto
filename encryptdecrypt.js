@@ -4,36 +4,34 @@ var crypto = require('crypto'),
   bops = require('bops')
 
 
-// options should be input encoding which defaults to buffer
-// and output encoding which is what you want the output to be
-// output encoding should default to buffer
 exports.encypher = function cryptoStreamEncypher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.encrypt) opts.encrypt = {}
   var alg = opts.algorithm || 'aes-256-cbc'
   var ine = (opts.encrypt.inputEncoding === undefined ? 'utf8' : opts.encrypt.inputEncoding)
   var enc = (opts.encrypt.encoding === undefined ? undefined : opts.encrypt.encoding)
-  var encipher = crypto.createCipher(alg, opts.password)
+  var encipher = crypto.createCipher(alg, opts.password);
+  (enc !== undefined ? encipher.setEncoding(enc) : '')
   encipher.pause()
   var concat = pull.Through(function (read) {
-    var sent = false, dataType,
-        plainTxt = '', buffers = []
+    var sent = false,
+        buffers = [],
+        plainTxt = '',
+        dataType;
     return function (end, cb) {
       read(end, function next(end, data) {
         var buffer
-        if (Buffer.isBuffer(data)) {
+        if (bops.is(data)) {
           dataType = 'buffer'
           buffer = data
           buffer.len = buffer.length
           buffers.push(buffer)
         } else if (data !== undefined) {
-          dataType = 'string'
-          plainTxt += data;
-          (enc !== undefined ? encipher.setEncoding(enc) : '')
+          plainTxt += data
         }
         if (end === true && sent === false) {
             if (dataType === 'buffer') {
-              var all = Buffer.concat(buffers, totalLen(buffers))
+              var all = bops.join(buffers)
               sent = true
               cb(false, all)  
             } else {
@@ -60,28 +58,28 @@ exports.decypher = function cryptoStreamDecypher(opts) {
   var alg = opts.algorithm || 'aes-256-cbc'
   var ine = (opts.decrypt.inputEncoding === undefined ? 'utf8' : opts.decrypt.inputEncoding)
   var enc = (opts.decrypt.encoding === undefined ? undefined : opts.decrypt.encoding)
-  var decipher = crypto.createDecipher(alg, opts.password)
-  decipher.pause();
+  var decipher = crypto.createDecipher(alg, opts.password);
   (enc !== undefined ? decipher.setEncoding(enc) : '')
+  decipher.pause();
   var concat = pull.Through(function (read) {
-    var sent = false, dataType,
-        cipherTxt = '', buffers = []
+    var sent = false,
+        buffers = []
     return function (end, cb) {
       read(end, function next(end, data) {
         var buffer
         if (data !== undefined) {
-          if (Buffer.isBuffer(data)) {
+          if (bops.is(data)) {
             buffer = data
             buffer.len = buffer.length
             buffers.push(buffer)
           } else {
-            buffer = new Buffer(data, opts.encrypt.encoding)
+            buffer = bops.from(data, opts.encrypt.encoding)
             buffer.len = buffer.length
-            buffers.push(buffer);
+            buffers.push(buffer)
           }
         }
         if (end === true && sent === false) {
-            var all = Buffer.concat(buffers, totalLen(buffers))
+            var all = bops.join(buffers)
             sent = true
             cb(false, all)
         } else if (end === true && sent === true) {
@@ -96,10 +94,4 @@ exports.decypher = function cryptoStreamDecypher(opts) {
     concat(),
     toPull(decipher)
   )
-}
-
-function totalLen(buffArray) {
-  return buffArray.reduce(function(a, b) {
-    return a.len + b.len
-  })
 }
