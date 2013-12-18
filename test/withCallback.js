@@ -14,7 +14,7 @@ var cryptoStreams = require('../index.js'),
 // the full message after decryption
 tape('ecrypt and decrypt into callback', function(t) {
   t.plan(1)
-  var vals = ['one', 'two', 'three', 'four']
+  var vals = ['onesupercallafragalisticespeyalladoeshus', 'two', 'three', 'four']
   pull(
     pull.values(vals),
     encrypt(opts, function(err, encrypted) {

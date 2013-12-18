@@ -11,16 +11,17 @@ var ciphers = [
   'aes128', 'aes192', 'aes256', 'bf', 'blowfish', 'cast', 'des', 'des3', 'desx', 'idea', 'rc2', 'seed'
 ]
 
+var vals = ['node issue # 6477 told me to make input to xts',
+  'more than 16bytes so that is what i am doing so this should work'
+]
+
 ciphers.forEach(function(ciph, i) {
 
 tape('encrypt and decrypt using ' + ciph, function(t) {
-  var vals = ['node issue # 6477 told me to make input to xts',
-    'more than 16bytes so that is what i am doing so this should work'
-  ]
 
     opts = {
       password : 'secret',
-      algorithm : ciphers[i]
+      algorithm : ciphers[i],
     };
 
     pull(
@@ -29,6 +30,7 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
       decrypt(opts),
       pull.collect(function(err, result) {
         if (err) {
+          console.dir(err)
           t.notOk(err === null, "Failed while trying cipher : " + ciph)
         } else {
           result = result.join('')
@@ -40,14 +42,3 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
 
   })
 })
-
-function totalLength(buffArray) {
-  var total = 0
-  buffArray.forEach(function(buff) {
-    if (Buffer.isBuffer(buff)) {
-      total += buff.length
-      return
-    }
-  })
-  return total
-}

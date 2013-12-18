@@ -8,6 +8,13 @@ var cryptoStreams = require('../index.js'),
   bops = require('bops'),
   opts = {
     password : 'secret',
+    encrypt : {
+      encoding : 'hex'
+    },
+    decrypt : {
+      inputEncoding : 'hex',
+      encoding : 'ascii'
+    }
   },
   decrypted,
   seeThrough = pull.Through(function(read, map) {
@@ -39,8 +46,8 @@ tape('encrypt and decrypt multi chunk streaming network data source', function(t
         encrypt(opts),
         decrypt(opts),
         pull.collect(function(end, decrypted) {
-          decrypted = bops.join(decrypted)
-          t.equal(data.toString(), decrypted.toString(), "each chunk received from network should be same after encryption and decryption")
+          //decrypted = bops.join(decrypted)
+          t.equal(data.toString(), decrypted.join(''), "each chunk received from network should be same after encryption and decryption")
         })
       )
       return
