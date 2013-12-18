@@ -16,6 +16,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
         dataType;
     return function (end, cb) {
       read(end, function next(end, data) {
+        console.log("Encrypt Data : " + data)
         cipherTxt = ''
         if (end === true) {
           return cb(true)
@@ -104,6 +105,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
         dataType;
     return function (end, cb) {
       read(end, function next(end, data) {
+        console.log("Decrypt Data : " + data)
         plainTxt = ''
         if (end === true) {
           return cb(true)
