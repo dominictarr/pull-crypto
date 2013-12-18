@@ -24,6 +24,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
         var buffer
         if (bops.is(data)) {
           dataType = 'buffer'
+          enc = (enc === 'buffer' ? undefined : enc)
           try {
             buffer = new Buffer(cipher.update(data))
           } catch (e) {
@@ -111,6 +112,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
         var buffer
         if (bops.is(data)) {
           dataType = 'buffer'
+          enc = (enc === 'buffer' ? undefined : enc)
           try {
             buffer = new Buffer(decipher.update(data))
           } catch (e) {

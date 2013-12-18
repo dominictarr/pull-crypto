@@ -47,34 +47,21 @@ pull(
   pull.log()
 )
 ```
-Note : options object is intentionally verbose in above example to show all properties. The only thing you are required to pass in is the `password` property. This will ensure your data is not encrypted with any default password. If not supplied it will throw!
+Note : options object is intentionally verbose in above example to show all properties. The only thing you are required to pass in is the `password` property. This will ensure your data is not encrypted with any default password. **If no password is supplied it will throw!**
 
-Options Object defaults :
+####Options Object defaults :
 * algorithm : `aes-256-cbc`
-* encrypt.encoding : `buffer`
-* decrypt.encoding : `buffer`
+* string data
+  * encrypt.inputEncoding : `ascii`
+  * encrypt.encoding : `base64`
+  *decrypt.inputEncoding : `base64`
+  *decrypt.encoding : `ascii`
+* buffer data
+  *encrypt.encoding : `buffer`
+  *decrypt.encoding : `buffer`
 
-Below is same example as above with Callback supplied. It also has a slimmed down options object.
-
-```js
-var pc = require('pull-crypto')
-var pull = require('pull-stream')
-var opts = {
-  password : 'secret',
-  encrypt : {
-    inputEncoding : 'ascii',
-    encoding : 'hex'
-  }
-}
-   
-pull(
-  pull.values(['a', 'b', 'c']),
-  pc.encrypt(opts, function(err, encrypted) {
-    if (err) throw err
-    console.log(encrypted)
-  })
-)
-```
+_Note that when passing in a buffer the `inputEncoding` option is ignored so it is not listed above_
+_If you don't declare a value for `encoding` and the dataType is buffer then you will receive a buffer back._
 
 ## decrypt
 
@@ -87,7 +74,7 @@ var opts = {
   password : 'secret',
   decrypt : {
     inputEncoding : 'hex',
-    encoding : 'utf8'
+    encoding : 'ascii'
   }
 }
    
@@ -98,17 +85,44 @@ pull(
 )
 ```
 
-You can also pass a callback to `decrypt` as shown above with the `encrypt` example.
+You can also pass a callback to `decrypt`.
+
+Below is same example as above with Callback supplied. It also has a slimmed down options object.
+
+```js
+var pc = require('pull-crypto')
+var pull = require('pull-stream')
+var opts = {
+  password : 'secret',
+  decrypt : {
+    inputEncoding : 'hex',
+    encoding : 'ascii'
+  }
+}
+   
+pull(
+  pull.values(['2ad16d51e86e596f274c00c1674563eb', 'b4d45754b6c12f8f780b8245cefa3b60', 'eba7bdc73915a45cbd7e45b0b2dd2d29']),
+  pc.decrypt(opts, function(err, encrypted) {
+    if (err) throw err
+    console.log(encrypted.join(''))
+  })
+)
+```
+Note that when using the callback style as above __this function will not stream!__
+It will buffer all data until upstream calls `cb(true)` indicating there is no more data and then it will call your callback with all of the transformed data.
+The returned data will be in the form of an array. Since the data has been encrypted chunk by chunk you will have to decrypt it chunk by chunk. So the callback style is better suited for decryption. When you don't need to stream and you want all the data back at the same time. All you have to do is call `join('')` on the returned data to concatinate the decrypted result as shown above.
 
 ### algorithms
 
-You can choose any algorithm that is available through node's `crypto.getCiphers()` method. You can take a look in the tests folder for the `allCiphers.js` file. This will go attempt to encrypt and decrypt values using all possible ciphers on your system.
+You can choose any algorithm that is available through node's `crypto.getCiphers()` method. Check out the tests folder, you'll find the most common algorithms tested.
 
 ### encoding
 
-Please note that the output encoding must be set explicitly. This is very important if you would like to control the output of the encrytion or decryption. You could easily set `opts.encrypt.encoding` to `hex` if you would like to store encrypted data in `hex` format. Likewise you can do the same with your decrypted data if you'd like to store it in something other than `ascii` or `utf8`, i.e. human readable.
+If you input is a `string` please remember you must set `opts.encrypt.encoding` to the same value as `opts.decrypt.inputEncoding` or you will not be able to decrypt the data.
 
-If you leave these options blank than it will be defaulted to `buffer`. You can pass in a buffer and get a buffer back as long as you don't set the encoding for either the `encrypt` or `decrypt` methods. You can also pass in a buffer and set the `decrypt` encoding to `utf8` and get back `utf8` data.
+If you send in a `buffer` and you've set `opts.encrypt.encoding` then you will get back a `string`. If you don't set `opts.encrypt.encoding` or you put `buffer` as the value you will get back a `buffer`.
+
+You could easily set `opts.encrypt.encoding` to `hex` if you would like to store encrypted data in `hex` format. Likewise you can do the same with your decrypted data if you'd like to store it in something other than `ascii` or `utf8`, i.e. human readable.
 
 See node's [crypto](http://nodejs.org/api/crypto.html#crypto_class_cipher) module for details on encoding.
 
