@@ -26,7 +26,10 @@ tape('buffer in string out', function(t) {
         pull.values([encrypted]),
         decrypt(opts),
         pull.collect(function(err, d) {
-          if (err) throw err
+          if (err) {
+            console.dir(err)
+            throw err.error
+          }
           t.equal((typeof d[0] === 'string'), true, "Output of decrypt should be a string")
           var decrypted = d.join('')
           t.equal('buffer goes in and string comes out', decrypted, "original string put into buffer should match the decrypted text")
