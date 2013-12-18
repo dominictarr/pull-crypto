@@ -56,8 +56,8 @@ Note : options object is intentionally verbose in above example to show all prop
 * string data
   * encrypt.inputEncoding : `ascii`
   * encrypt.encoding : `base64`
-  *decrypt.inputEncoding : `base64`
-  *decrypt.encoding : `ascii`
+  * decrypt.inputEncoding : `base64`
+  * decrypt.encoding : `ascii`
 * buffer data
   * encrypt.encoding : `buffer`
   * decrypt.encoding : `buffer`
