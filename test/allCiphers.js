@@ -15,17 +15,10 @@ ciphers.forEach(function(ciph, i) {
 
 tape('encrypt and decrypt using ' + ciph, function(t) {
   var vals = ['node issue # 6477 told me to make input to xts',
-              'more than 16bytes so that is what i am doing so this should work']
+    'more than 16bytes so that is what i am doing so this should work'
+  ]
 
     opts = {
-      encrypt : {
-        inputEncoding : 'ascii',
-        encoding : 'base64'
-      },
-      decrypt : {
-        inputEncoding : 'base64',
-        encoding : 'ascii'
-      },
       password : 'secret',
       algorithm : ciphers[i]
     };
@@ -35,11 +28,12 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
       encrypt(opts),
       decrypt(opts),
       pull.collect(function(err, result) {
+        console.dir(result)
         if (err) {
           t.notOk(err === null, "Failed while trying cipher : " + ciph)
         } else {
-          result = (Buffer.isBuffer(result[0]) === true ? Buffer.concat(result, totalLength(result)) : result.join(''))
-          t.equal(vals.join(''), result.toString(), "Results should be the same as original values before encrypting for Cipher : " + ciph)
+          result = result.join('')
+          t.equal(vals.join(''), result, "Results should be the same as original values before encrypting for Cipher : " + ciph)
             t.end()
         }
       })

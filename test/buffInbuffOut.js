@@ -21,9 +21,9 @@ tape('buffer is default output', function(t) {
         decrypt(opts),
         pull.collect(function(err, d) {
           if (err) throw err
-          var decrypted = (Buffer.isBuffer(d[0]) === true ? Buffer.concat(d, totalLength(d)) : d.join(''))
+          var decrypted = Buffer.concat(d, totalLength(d))
           t.equal(Buffer.isBuffer(decrypted), true, "Should receive buffer after decryption")
-          t.equal('buffer goes in and buffer comes out', decrypted.toString('utf8'), "buffer to string decrypted message should match original messase before encryption")
+          t.equal('buffer goes in and buffer comes out', decrypted.toString('ascii'), "buffer to string decrypted message should match original message before encryption")
         })
       )
     })

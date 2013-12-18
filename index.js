@@ -28,8 +28,12 @@ exports.encrypt = function (opts, cb) {
     return pull(
       encypher(opts),
       pull.collect(function (err, ary) {
-        if(err) cb(err)
-        else   cb(null, bops.join(ary))
+        if(err) return cb(err)
+        if (bops.is(ary[0])) {
+          cb(null, bops.join(ary))
+        } else {
+          cb(null, ary)
+        }
       })
     )
     return encypher(opts)
@@ -40,8 +44,12 @@ exports.decrypt = function (opts, cb) {
     return pull(
       decypher(opts),
       pull.collect(function (err, ary) {
-        if(err) cb(err)
-        else   cb(null, bops.join(ary))
+         if(err) return cb(err)
+        if (bops.is(ary[0])) {
+          cb(null, bops.join(ary))
+        } else {
+          cb(null, ary)
+        }
       })
     )
     return decypher(opts)

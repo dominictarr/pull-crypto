@@ -16,16 +16,20 @@ tape('buffer in string out', function(t) {
     pull.values([new Buffer('buffer goes in and string comes out')]),
     encrypt(opts),
     pull.collect(function(err, r) {
-      if (err) throw err
-      var encrypted = (Buffer.isBuffer(r[0]) === true ? Buffer.concat(r, totalLength(r)) : r.join(''))
+      if (err) {
+        console.dir(err)
+        throw err.error
+      }
+      var encrypted = Buffer.concat(r, totalLength(r))
       t.equal(Buffer.isBuffer(encrypted), true, "Should receive buffer after encryption")
       pull(
         pull.values([encrypted]),
         decrypt(opts),
         pull.collect(function(err, d) {
           if (err) throw err
+          t.equal((typeof d[0] === 'string'), true, "Output of decrypt should be a string")
           var decrypted = d.join('')
-          t.equal(Buffer.isBuffer(decrypted), false, "Should receive string after decryption")
+          console.dir(decrypted)
           t.equal('buffer goes in and string comes out', decrypted, "original string put into buffer should match the decrypted text")
         })
       )

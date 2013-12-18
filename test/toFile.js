@@ -5,17 +5,9 @@ var cryptoStreams = require('../index.js'),
   toPull = require('stream-to-pull-stream'),
   tape = require('tape'),
   fs = require('fs'),
-  thisFile = fs.createReadStream(__filename, {encoding : 'ascii'}),
+  thisFile = fs.createReadStream(__filename),
   writeStream = fs.createWriteStream('./output.txt', {encoding : 'ascii'}),
   opts = {
-    encrypt : {
-      inputEncoding : 'ascii',
-      encoding : 'base64'
-    },
-    decrypt : {
-      inputEncoding : 'base64',
-      encoding : 'ascii'
-    },
     password : 'secret',
   };
 
@@ -28,17 +20,25 @@ tape('read file then encrypt data write encrypted data to file decrypt encrypted
   )
   writeStream.on('close', function() {
     pull(
-      toPull(fs.createReadStream('./output.txt', {encoding : 'ascii'})),
-      decrypt(opts, function(err, result) {
-        if (err) throw err
+      toPull(fs.createReadStream('./output.txt')),
+      decrypt(opts),
+      pull.collect(function(err, decrypted) {
+        if (err) {
+          console.dir(err)
+          throw err.error
+        }
         pull(
           toPull(fs.createReadStream(__filename)),
           pull.collect(function(err, file) {
-            t.equal(file.join(''), result, "File data should be same as the result of decrypting the encrypted file data we just wrote")
+            if (err) throw err
+            console.log(file.join(''))
+            console.log(decrypted.join(''))
+            t.equal(file.join(''), decrypted.join(''), "File data should be same as the result of decrypting the encrypted file data we just wrote")
             // clean up
             fs.unlinkSync('./output.txt')
           })
         )
+        
       })
     )
   })
