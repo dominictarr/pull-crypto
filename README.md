@@ -32,9 +32,11 @@ var pc = require('pull-crypto')
 var pull = require('pull-stream')
 var opts = {
   encrypt : {
+    inputEncoding : 'ascii',
     encoding : 'base64'
   },
   decrypt : {
+    inputEncoding : 'base64',
     encoding : 'utf8'
   },
   algorithm : 'aes-256-cbc',
@@ -57,8 +59,8 @@ Note : options object is intentionally verbose in above example to show all prop
   *decrypt.inputEncoding : `base64`
   *decrypt.encoding : `ascii`
 * buffer data
-  *encrypt.encoding : `buffer`
-  *decrypt.encoding : `buffer`
+  * encrypt.encoding : `buffer`
+  * decrypt.encoding : `buffer`
 
 _Note that when passing in a buffer the `inputEncoding` option is ignored so it is not listed above_
 _If you don't declare a value for `encoding` and the dataType is buffer then you will receive a buffer back._
