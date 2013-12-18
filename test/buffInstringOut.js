@@ -29,7 +29,6 @@ tape('buffer in string out', function(t) {
           if (err) throw err
           t.equal((typeof d[0] === 'string'), true, "Output of decrypt should be a string")
           var decrypted = d.join('')
-          console.dir(decrypted)
           t.equal('buffer goes in and string comes out', decrypted, "original string put into buffer should match the decrypted text")
         })
       )

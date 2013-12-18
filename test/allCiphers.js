@@ -28,7 +28,6 @@ tape('encrypt and decrypt using ' + ciph, function(t) {
       encrypt(opts),
       decrypt(opts),
       pull.collect(function(err, result) {
-        console.dir(result)
         if (err) {
           t.notOk(err === null, "Failed while trying cipher : " + ciph)
         } else {

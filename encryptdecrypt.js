@@ -17,8 +17,6 @@ exports.encypher = function cryptoStreamEncypher(opts) {
     return function (end, cb) {
       read(end, function next(end, data) {
         cipherTxt = ''
-        //console.log("Encrypt Data : " + data)
-        console.log("Encrypt End : " + end)
         if (end === true) {
           return cb(true)
         }
@@ -51,14 +49,12 @@ exports.encypher = function cryptoStreamEncypher(opts) {
           }
           buffers.push(finalBuff)
           all = bops.join(buffers, enc)
-          console.log("OUTPUT ENCODING ON ENCRYPT IS SET TO : ", enc)
           if (enc !== undefined && enc !== 'buffer') {
             all = bops.to(all, enc)
           }
           buffers = []
           return cb(false, all)
         } else if (typeof data === 'string') {
-          console.log("Encrypt Data is : " + data)
           enc = (enc === undefined ? 'base64' : enc)
           dataType = 'string';
           try {
@@ -83,12 +79,9 @@ exports.encypher = function cryptoStreamEncypher(opts) {
               error : e
             })
           }
-          console.log("Cipher Text : " + cipherTxt)
-          console.log("Encrypt Calling Back")
           return cb(false, cipherTxt)
         }
         if (end !== true) {
-          console.log("Encrypt Reading")
           read(end, next)
         }
       })
@@ -111,8 +104,6 @@ exports.decypher = function cryptoStreamDecipher(opts) {
     return function (end, cb) {
       read(end, function next(end, data) {
         plainTxt = ''
-        //console.log("Decrypt Data : " + data)
-        console.log("Decrypt End : " + end)
         if (end === true) {
           return cb(true)
         }
@@ -145,7 +136,6 @@ exports.decypher = function cryptoStreamDecipher(opts) {
           }
           buffers.push(finalBuff)
           all = bops.join(buffers, enc)
-          console.log("OUTPUT ENCODING ON DECRYPT IS SET TO : ", enc)
           if (enc !== undefined && enc !== 'buffer') {
             all = bops.to(all, enc)
           }
@@ -153,7 +143,6 @@ exports.decypher = function cryptoStreamDecipher(opts) {
           return cb(false, all)
         } else if (typeof data === 'string') {
           dataType = 'string'
-          console.log("Decrypt Data is : " + data)
           enc = (enc === undefined ? 'ascii' : enc)
           dataType = 'string';
           try {
@@ -178,12 +167,9 @@ exports.decypher = function cryptoStreamDecipher(opts) {
               error : e
             })
           }
-          console.log("Plain Text : " + plainTxt)
-          console.log("Decrypt Calling Back")
           return cb(false, plainTxt)
         }
         if (end !== true) {
-          console.log("Decrypt Reading")
           read(end, next)
         }
       })

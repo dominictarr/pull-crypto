@@ -31,8 +31,6 @@ tape('read file then encrypt data write encrypted data to file decrypt encrypted
           toPull(fs.createReadStream(__filename)),
           pull.collect(function(err, file) {
             if (err) throw err
-            console.log(file.join(''))
-            console.log(decrypted.join(''))
             t.equal(file.join(''), decrypted.join(''), "File data should be same as the result of decrypting the encrypted file data we just wrote")
             // clean up
             fs.unlinkSync('./output.txt')

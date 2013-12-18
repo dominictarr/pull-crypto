@@ -5,8 +5,7 @@ var cryptoStreams = require('../index.js'),
   tape = require('tape'),
   opts = {
     password : 'secret',
-  },
-  count = 0
+  }
 
 tape('ecrypt then pipe to decrypt then pipe to collect values', function(t) {
  t.plan(1)
@@ -20,9 +19,7 @@ tape('ecrypt then pipe to decrypt then pipe to collect values', function(t) {
         console.dir(err)
         throw err.error
       }
-      console.log("Collect Results : " + result)
       t.equal(vals.join(''), result.join(''), "Values should be same after being encrypted and then decrypted")
-      count += 1
     })
   )
 })
