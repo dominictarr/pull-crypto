@@ -42,7 +42,7 @@ for (var i = 0; i < 10; i += 1) {
   random.push(genData())
 }
 console.dir(random)
-tape('generate 1000 random hex values, encrypt and decrypt them and see if they match the original hex value', function(t) {
+tape('generate 10 random hex values, encrypt and decrypt them and see if they match the original hex value', function(t) {
   
   pull(
     pull.values(random),
