@@ -19,8 +19,11 @@ var cryptoStreams = require('../index.js'),
   seeThrough = pull.Through(function(read, map) {
     return function (end, cb) {
       read(end, function next(end, data) {
-        if (end) return cb(true)
-        map(data)
+        if (end === true) {
+          cb(true)
+        } else {
+          map(data)
+        }
         if (end !== true) {
           read(end, next)
         }
@@ -32,12 +35,15 @@ var cryptoStreams = require('../index.js'),
         if(end === true) {
           return
         }
-        read(null, next)
+        if (end !== true) {
+          read(null, next)
+        }
       })
   }),
   count = 0
 
 var random = []
+var results = []
 for (var i = 0; i < 10; i += 1) {
   random.push(genData())
 }
@@ -50,8 +56,11 @@ tape('generate 10 random hex values, encrypt and decrypt them and see if they ma
     decrypt(opts),
     seeThrough(function(data) {
       t.equal(random[count], data, "Each decrypted chunk should be equal to original array item sent to be encrypted")
-      if (++count >= i) {
+      results.push(data)
+      if (++count >= 12) {
+        console.dir(results)
         t.end()
+        return
       }
       return
     }),
