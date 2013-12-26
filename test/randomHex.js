@@ -51,9 +51,7 @@ tape('generate 10 random hex values, encrypt and decrypt them and see if they ma
       if (++count >= (random.length + 1)) {
         t.equal(random.join(''), results.join(''), "Whole string should be equal even if chunks are broken up")
         t.end()
-        return
       }
-      return
     }),
     fin()
   )
