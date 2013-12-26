@@ -30,9 +30,6 @@ var cryptoStreams = require('../index.js'),
       })
     }
   }),
-  fin = curry(function (read) {
-    read(null)
-  }),
   count = 0
 
 var random = []
@@ -40,7 +37,7 @@ var results = []
 for (var i = 0; i < 10; i += 1) {
   random.push(genData())
 }
-tape('generate 10 random hex values, encrypt and decrypt them and see if they match the original hex value', function(t) {
+tape('generate 10 random hex values, every chunk sent downstream should not be empty and results concatinated should match orginal hex values', function(t) {
   
   pull(
     pull.values(random),
@@ -48,12 +45,14 @@ tape('generate 10 random hex values, encrypt and decrypt them and see if they ma
     decrypt(opts),
     seeThrough(function(data) {
       results.push(data)
+      t.ok(data.length, "Downstream Data should NOT be an empty string or buffer")
       if (++count >= (random.length + 1)) {
         t.equal(random.join(''), results.join(''), "Whole string should be equal even if chunks are broken up")
         t.end()
+        return
       }
     }),
-    fin()
+    pull.log()
   )
 })
 
