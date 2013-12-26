@@ -31,7 +31,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
                 error : e
               })
             }
-            cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
+            if (finalbuffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
           } else {
             try {
               cipherTxt = cipher.final(enc)
@@ -63,7 +63,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
               error : e
             })
           }
-          return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(buffer, enc) : buffer))
+          if (buffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(buffer, enc) : buffer))
         } else if (typeof data === 'string') {
           enc = (enc === undefined ? 'base64' : enc)
           dataType = 'string';
@@ -117,7 +117,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
                 error : e
               })
             }
-            cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
+            if (finalbuffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
           } else {
             try {
               plainTxt = decipher.final(enc)
@@ -149,7 +149,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
               error : e
             })
           }
-          return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(buffer, enc) : buffer))
+          if (buffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(buffer, enc) : buffer))
         } else if (typeof data === 'string') {
           enc = (enc === undefined ? 'ascii' : enc)
           dataType = 'string';
