@@ -20,7 +20,7 @@ var cryptoStreams = require('../index.js'),
     return function (end, cb) {
       read(end, function next(end, data) {
         if (end === true) {
-          cb(true)
+          return cb(true)
         } else {
           map(data)
         }
@@ -31,14 +31,7 @@ var cryptoStreams = require('../index.js'),
     }
   }),
   fin = curry(function (read) {
-    read(null, function next (end, data) {
-        if(end === true) {
-          return
-        }
-        if (end !== true) {
-          read(null, next)
-        }
-      })
+    read(null)
   }),
   count = 0
 
@@ -47,7 +40,6 @@ var results = []
 for (var i = 0; i < 10; i += 1) {
   random.push(genData())
 }
-console.dir(random)
 tape('generate 10 random hex values, encrypt and decrypt them and see if they match the original hex value', function(t) {
   
   pull(
@@ -55,10 +47,9 @@ tape('generate 10 random hex values, encrypt and decrypt them and see if they ma
     encrypt(opts),
     decrypt(opts),
     seeThrough(function(data) {
-      t.equal(random[count], data, "Each decrypted chunk should be equal to original array item sent to be encrypted")
       results.push(data)
-      if (++count >= 12) {
-        console.dir(results)
+      if (++count >= (random.length + 1)) {
+        t.equal(random.join(''), results.join(''), "Whole string should be equal even if chunks are broken up")
         t.end()
         return
       }

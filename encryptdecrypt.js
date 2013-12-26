@@ -33,10 +33,21 @@ exports.encypher = function cryptoStreamEncypher(opts) {
             }
             cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
           } else {
-            cb(false, cipher.final(enc))
+            try {
+              cipherTxt = cipher.final(enc)
+            } catch (e) {
+              return cb({
+                op : 'cipher final',
+                dataType : dataType,
+                dataChunk : data,
+                buffer : buffer,
+                error : e
+              })
+            }
+            if (cipherTxt.length > 0) cb(false, cipherTxt);
           }
         } else if (end === true && finalized === true) {
-          return cb(true)
+          cb(true)
         }
         if (bops.is(data)) {
           dataType = 'buffer'
@@ -67,7 +78,7 @@ exports.encypher = function cryptoStreamEncypher(opts) {
               error : e
             })
           }
-          return cb(false, cipherTxt);
+          if (cipherTxt.length > 0) cb(false, cipherTxt);
         }
         if (end !== true) {
           read(end, next)
@@ -108,10 +119,21 @@ exports.decypher = function cryptoStreamDecipher(opts) {
             }
             cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
           } else {
-            cb(false, decipher.final(enc))
+            try {
+              plainTxt = decipher.final(enc)
+            } catch (e) {
+              return cb({
+                op : 'decipher final',
+                dataType : dataType,
+                dataChunk : data,
+                buffer : buffer,
+                error : e
+              })
+            }
+            if (plainTxt.length > 0) cb(false, plainTxt);
           }
         } else if (end === true && finalized === true) {
-          return cb(true)
+          cb(true)
         }
         if (bops.is(data)) {
           dataType = 'buffer'
@@ -142,7 +164,7 @@ exports.decypher = function cryptoStreamDecipher(opts) {
               error : e
             })
           }
-          return cb(false, plainTxt);
+          if (plainTxt.length > 0) cb(false, plainTxt);
         }
         if (end !== true) {
           read(end, next)
