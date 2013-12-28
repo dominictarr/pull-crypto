@@ -5,33 +5,67 @@ var cryptoStreams = require('../index.js'),
   toPull = require('stream-to-pull-stream'),
   tape = require('tape'),
   hq = require('hyperquest'),
+  bops = require('bops'),
   opts = {
+    password : 'secret',
     encrypt : {
-      inputEncoding : 'utf8',
-      encoding : 'base64'
+      encoding : 'hex'
     },
     decrypt : {
-      inputEncoding : 'base64',
-      encoding : 'utf8'
-    },
-    password : 'secret',
-  };
+      inputEncoding : 'hex',
+      encoding : 'ascii'
+    }
+  },
+  decrypted,
+  seeThrough = pull.Through(function(read, map) {
+    return function (end, cb) {
+      read(end, function next(end, data) {
+        if (end) return cb(true)
+        map(data)
+        if (end !== true) {
+          read(end, next)
+        }
+      })
+    }
+  }),
+  fin = curry(function (read, done) {
+    read(null, function next (end, data) {
+        if(end === true) {
+          return done(end === true ? null : end, 'done')
+        }
+        read(null, next)
+      })
+  })
 
-tape('encrypt and decrypt multi chunk network data source', function(t) {
-  var fromNPM = '',
-      afterDecrypt = ''
-  t.plan(1)
-  toPull(hq('http://registry.npmjs.org/pull-stream'))
-    .pipe(pull.collect(function(err, result) {
-      fromNPM = result.toString()
+tape('encrypt and decrypt multi chunk streaming network data source', function(t) {
+  pull(
+    toPull(hq('http://registry.npmjs.org/pull-stream')),
+    seeThrough(function(data) {
       pull(
-        pull.values([fromNPM]),
+        pull.values([data]),
         encrypt(opts),
-        decrypt(opts, function(err, result) {
-          if (err) throw err
-          afterDecrypt = result
-          t.equal(fromNPM, afterDecrypt, "Result collected from Registry should match decrypted text")
+        decrypt(opts),
+        pull.collect(function(end, decrypted) {
+          //decrypted = bops.join(decrypted)
+          t.equal(data.toString(), decrypted.join(''), "each chunk received from network should be same after encryption and decryption")
         })
       )
-    }))
+      return
+    }),
+    fin(function(err, d) {
+      if (err) throw err
+      t.end()
+      return
+    })
+  )
 })
+
+function curry (fun) {
+  return function () {
+    var args = [].slice.call(arguments)
+    return function (read) {
+      args.unshift(read)
+      return fun.apply(null, args)
+    }
+  }
+}
