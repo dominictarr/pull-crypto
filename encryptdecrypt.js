@@ -1,5 +1,4 @@
 var crypto = require('crypto'),
-    pull = require('pull-stream'),
     bops = require('bops')
 
 function createPullCipher(cipher, options) {
