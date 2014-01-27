@@ -34,7 +34,6 @@ exports.encipher = function cryptoStreamEncipher(opts) {
   opts.algorithm = opts.algorithm || 'aes-256-cbc'
   opts.encrypt.inputEncoding = (opts.encrypt.inputEncoding === undefined ? 'buffer' : opts.encrypt.inputEncoding)
   opts.encrypt.encoding = (opts.encrypt.encoding === undefined ? 'buffer' : opts.encrypt.encoding)
-  opts.encrypt.type = 'encrypt'
   var cipher = crypto.createCipher(opts.algorithm, opts.password)
   return createPullCipher(cipher, opts.encrypt)
 }
@@ -45,7 +44,6 @@ exports.decipher = function cryptoStreamDecipher(opts) {
   opts.algorithm = opts.algorithm || 'aes-256-cbc'
   opts.decrypt.inputEncoding = (opts.decrypt.inputEncoding === undefined ? 'buffer' : opts.decrypt.inputEncoding)
   opts.decrypt.encoding = (opts.decrypt.encoding === undefined ? 'buffer' : opts.decrypt.encoding)
-  opts.decrypt.type = 'decrypt'
   var decipher = crypto.createDecipher(opts.algorithm, opts.password)
   return createPullCipher(decipher, opts.decrypt)
 }
