@@ -24,8 +24,7 @@ tape('read file then encrypt data write encrypted data to file decrypt encrypted
       decrypt(opts),
       pull.collect(function(err, decrypted) {
         if (err) {
-          console.dir(err)
-          throw err.error
+          throw err
         }
         pull(
           toPull(fs.createReadStream(__filename)),

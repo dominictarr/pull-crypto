@@ -7,14 +7,13 @@ var cryptoStreams = require('../index.js'),
   opts = {
     password : 'secret',
     encrypt : {
-      inputEncoding : 'hex',
-      encoding : 'base64'
+      inputEncoding : 'ascii',
+      encoding : 'hex'
     },
     decrypt : {
-      inputEncoding : 'base64',
-      encoding : 'hex'
+      inputEncoding : 'hex',
+      encoding : 'ascii'
     }
-    
   },
   seeThrough = pull.Through(function(read, map) {
     return function (end, cb) {
@@ -34,8 +33,8 @@ var cryptoStreams = require('../index.js'),
 
 var random = []
 var results = []
-for (var i = 0; i < 10; i += 1) {
-  random.push(genData())
+for (var i = 0; i < 2; i += 1) {
+  random.push(genData(30))
 }
 tape('generate 10 random hex values, every chunk sent downstream should not be empty and results concatinated should match orginal hex values', function(t) {
   
@@ -45,29 +44,20 @@ tape('generate 10 random hex values, every chunk sent downstream should not be e
     decrypt(opts),
     seeThrough(function(data) {
       results.push(data)
-      t.ok(data.length, "Downstream Data should NOT be an empty string or buffer")
-      if (++count >= (random.length + 1)) {
-        t.equal(random.join(''), results.join(''), "Whole string should be equal even if chunks are broken up")
+      t.ok(data.length, "Downstream Data should NOT be an empty string")
+      if (count >= random.length + 1) {
+        t.equal(results.join(''), random.join(''), "Results concatinated should be same as orginal hex values")
         t.end()
         return
       }
+      count += 1
     }),
     pull.log()
   )
 })
 
 
-function genData() {
-  var bytes = 30
+function genData(bytes) {
   return crypto.pseudoRandomBytes(bytes).toString('hex')
 }
 
-function curry (fun) {
-  return function () {
-    var args = [].slice.call(arguments)
-    return function (read) {
-      args.unshift(read)
-      return fun.apply(null, args)
-    }
-  }
-}

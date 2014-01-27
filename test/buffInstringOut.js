@@ -17,8 +17,7 @@ tape('buffer in string out', function(t) {
     encrypt(opts),
     pull.collect(function(err, r) {
       if (err) {
-        console.dir(err)
-        throw err.error
+        throw new Error(err)
       }
       var encrypted = Buffer.concat(r, totalLength(r))
       t.equal(Buffer.isBuffer(encrypted), true, "Should receive buffer after encryption")
@@ -27,8 +26,7 @@ tape('buffer in string out', function(t) {
         decrypt(opts),
         pull.collect(function(err, d) {
           if (err) {
-            console.dir(err)
-            throw err.error
+            throw err
           }
           t.equal((typeof d[0] === 'string'), true, "Output of decrypt should be a string")
           var decrypted = d.join('')

@@ -21,8 +21,7 @@ tape('buffer is default output', function(t) {
         decrypt(opts),
         pull.collect(function(err, d) {
           if (err) {
-            console.dir(err)
-            throw err.error
+            throw err
           }
           var decrypted = Buffer.concat(d, totalLength(d))
           t.equal(Buffer.isBuffer(decrypted), true, "Should receive buffer after decryption")

@@ -13,7 +13,6 @@ var cryptoStreams = require('../index.js'),
 
 
 tape('read file 2 times and collect encrypted text and check it it matches', function(t) {
-  t.plan(3)
   var encrypted1, encrypted2
   // read file encode text collect encrypted text in variable
   pull(
@@ -36,6 +35,7 @@ tape('read file 2 times and collect encrypted text and check it it matches', fun
         encrypted2 = Buffer.concat(b, totalLength(b))
         t.ok(Buffer.isBuffer(encrypted2), "Should be buffer")
         t.equal(encrypted1.toString('utf8'), encrypted2.toString('utf8'), "Both should be equal")
+        t.end()
       })
     )
   })

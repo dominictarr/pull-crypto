@@ -1,176 +1,51 @@
 var crypto = require('crypto'),
-  pull = require('pull-stream'),
-  bops = require('bops')
+    pull = require('pull-stream'),
+    bops = require('bops')
 
-
-exports.encypher = function cryptoStreamEncypher(opts) {
-  if (!opts.password) throw new Error("Must supply password")
-  if (!opts.encrypt) opts.encrypt = {}
-  var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.encrypt.inputEncoding === undefined ? 'ascii' : opts.encrypt.inputEncoding)
-  var enc = (opts.encrypt.encoding === undefined ? undefined : opts.encrypt.encoding)
-  var cipher = crypto.createCipher(alg, opts.password);
-  var encrypt = pull.Through(function (read) {
-    var cipherTxt = '',
-        dataType,
-        finalized = false
+function createPullCipher(cipher, options) {
+  var finalized = false
+  return function (read) {
     return function (end, cb) {
-      read(end, function next(end, data) {
-        cipherTxt = ''
-        if (end === true && finalized === false) {
+      read(null, function next (end, data) {
+        if (end === true) {
+          if (finalized) return cb(true)
           finalized = true
-          if (dataType === 'buffer') {
-            try {
-              var finalbuffer = new Buffer(cipher.final())
-            } catch (e) {
-              return cb({
-                op : 'cipher final',
-                dataType : dataType,
-                dataChunk : data,
-                finalbuffer : finalbuffer,
-                error : e
-              })
-            }
-            if (finalbuffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
-          } else {
-            try {
-              cipherTxt = cipher.final(enc)
-            } catch (e) {
-              return cb({
-                op : 'cipher final',
-                dataType : dataType,
-                dataChunk : data,
-                buffer : buffer,
-                error : e
-              })
-            }
-            if (cipherTxt.length > 0) cb(false, cipherTxt);
-          }
-        } else if (end === true && finalized === true) {
-          cb(true)
+          var fin = cipher.final(options.encoding)
+          if (fin.length > 0 && options.encoding !== 'buffer' && Buffer.isBuffer(fin) === true) cb(null, bops.to(fin, options.encoding))
+          else if (fin.length > 0 && options.encoding === 'buffer' && Buffer.isBuffer(fin) === false) cb(null, bops.from(fin, options.encoding))
+          else if (fin.length > 0) cb(null, fin)
         }
-        if (bops.is(data)) {
-          dataType = 'buffer'
-          enc = (enc === 'buffer' ? undefined : enc)
-          try {
-            var buffer = new Buffer(cipher.update(data))
-          } catch (e) {
-            return cb({
-              op : 'cipher update',
-              dataType : dataType,
-              dataChunk : data,
-              buffer : buffer,
-              error : e
-            })
-          }
-          if (buffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(buffer, enc) : buffer))
-        } else if (typeof data === 'string') {
-          enc = (enc === undefined ? 'base64' : enc)
-          dataType = 'string';
-          try {
-            cipherTxt = cipher.update(data, ine, enc)
-          } catch (e) {
-            return cb({
-              op : 'cipher update',
-              dataType : dataType,
-              dataChunk : data,
-              cipherTxt : cipherTxt,
-              error : e
-            })
-          }
-          if (cipherTxt.length > 0) cb(false, cipherTxt);
-        }
-        if (end !== true) {
-          read(end, next)
+        else if (end) cb(end) //error case
+        else {
+          var d = cipher.update(data, options.inputEncoding, options.encoding)
+          if (d.length > 0 && options.encoding !== 'buffer' && Buffer.isBuffer(d) === true) cb(null, bops.to(d, options.encoding))
+          else if (d.length > 0 && options.encoding === 'buffer' && Buffer.isBuffer(d) === false) cb(null, bops.from(d, options.encoding))
+          else if (d.length > 0) cb(null, d)
+          read(null, next)
         }
       })
     }
-  })
-  return encrypt()
+  }
 }
 
-exports.decypher = function cryptoStreamDecipher(opts) {
+exports.encipher = function cryptoStreamEncipher(opts) {
+  if (!opts.password) throw new Error("Must supply password")
+  if (!opts.encrypt) opts.encrypt = {}
+  opts.algorithm = opts.algorithm || 'aes-256-cbc'
+  opts.encrypt.inputEncoding = (opts.encrypt.inputEncoding === undefined ? 'buffer' : opts.encrypt.inputEncoding)
+  opts.encrypt.encoding = (opts.encrypt.encoding === undefined ? 'buffer' : opts.encrypt.encoding)
+  opts.encrypt.type = 'encrypt'
+  var cipher = crypto.createCipher(opts.algorithm, opts.password)
+  return createPullCipher(cipher, opts.encrypt)
+}
+
+exports.decipher = function cryptoStreamDecipher(opts) {
   if (!opts.password) throw new Error("Must supply password")
   if (!opts.decrypt) opts.decrypt = {}
-  var alg = opts.algorithm || 'aes-256-cbc'
-  var ine = (opts.decrypt.inputEncoding === undefined ? 'base64' : opts.decrypt.inputEncoding)
-  var enc = (opts.decrypt.encoding === undefined ? undefined : opts.decrypt.encoding)
-  var decipher = crypto.createDecipher(alg, opts.password);
-  var decrypt = pull.Through(function (read) {
-    var plainTxt = '',
-        dataType,
-        finalized = false
-    return function (end, cb) {
-      read(end, function next(end, data) {
-        plainTxt = ''
-        if (end === true && finalized === false) {
-          finalized = true
-          if (dataType === 'buffer') {
-            try {
-              var finalbuffer = new Buffer(decipher.final())
-            } catch (e) {
-              return cb({
-                op : 'decipher final',
-                dataType : dataType,
-                dataChunk : data,
-                finalbuffer : finalbuffer,
-                error : e
-              })
-            }
-            if (finalbuffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(finalbuffer, enc) : finalbuffer))
-          } else {
-            try {
-              plainTxt = decipher.final(enc)
-            } catch (e) {
-              return cb({
-                op : 'decipher final',
-                dataType : dataType,
-                dataChunk : data,
-                buffer : buffer,
-                error : e
-              })
-            }
-            if (plainTxt.length > 0) cb(false, plainTxt);
-          }
-        } else if (end === true && finalized === true) {
-          cb(true)
-        }
-        if (bops.is(data)) {
-          dataType = 'buffer'
-          enc = (enc === 'buffer' ? undefined : enc)
-         try {
-            var buffer = new Buffer(decipher.update(data))
-          } catch (e) {
-            return cb({
-              op : 'decipher update',
-              dataType : dataType,
-              dataChunk : data,
-              buffer : buffer,
-              error : e
-            })
-          }
-          if (buffer.length > 0) return cb(false, (enc !== 'buffer' && enc !== undefined ? bops.to(buffer, enc) : buffer))
-        } else if (typeof data === 'string') {
-          enc = (enc === undefined ? 'ascii' : enc)
-          dataType = 'string';
-          try {
-            plainTxt = decipher.update(data, ine, enc)
-          } catch (e) {
-            return cb({
-              op : 'decipher update',
-              dataType : dataType,
-              dataChunk : data,
-              plainTxt : plainTxt,
-              error : e
-            })
-          }
-          if (plainTxt.length > 0) cb(false, plainTxt);
-        }
-        if (end !== true) {
-          read(end, next)
-        }
-      })
-    }
-  })
-  return decrypt()
+  opts.algorithm = opts.algorithm || 'aes-256-cbc'
+  opts.decrypt.inputEncoding = (opts.decrypt.inputEncoding === undefined ? 'buffer' : opts.decrypt.inputEncoding)
+  opts.decrypt.encoding = (opts.decrypt.encoding === undefined ? 'buffer' : opts.decrypt.encoding)
+  opts.decrypt.type = 'decrypt'
+  var decipher = crypto.createDecipher(opts.algorithm, opts.password)
+  return createPullCipher(decipher, opts.decrypt)
 }
