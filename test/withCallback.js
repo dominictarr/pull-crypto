@@ -3,6 +3,7 @@ var cryptoStreams = require('../index.js'),
   decrypt = cryptoStreams.decrypt,
   pull = require('pull-stream'),
   tape = require('tape'),
+  pass = 'secret'
   opts = {
     password : 'secret',
     encrypt : {
@@ -25,11 +26,18 @@ tape('ecrypt and decrypt into callback', function(t) {
   var vals = ['onesupercallafragalisticespeyalladoeshus', 'two', 'three', 'four']
   pull(
     pull.values(vals),
-    encrypt(opts, function(err, encrypted) {
+    encrypt({
+      password : pass,
+      encoding : 'hex'
+    }, function(err, encrypted) {
       if (err) {
         throw err
       }
-      pull(pull.values(encrypted), decrypt(opts, function(err, decrypted) {
+      pull(pull.values(encrypted), decrypt({
+        password : pass,
+        inputEncoding : 'hex',
+        encoding : 'ascii'
+      }, function(err, decrypted) {
         if (err) {
           throw err
         }

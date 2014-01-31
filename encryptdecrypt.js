@@ -44,24 +44,22 @@ function createPullCipher(cipher, options) {
 
 exports.encipher = function cryptoStreamEncipher(opts) {
   if (!opts.password) throw new Error("Must supply password")
-  if (!opts.encrypt) opts.encrypt = {}
 
   opts.algorithm = opts.algorithm || 'aes-256-cbc'
-  opts.encrypt.inputEncoding = (opts.encrypt.inputEncoding === undefined ? 'buffer' : opts.encrypt.inputEncoding)
-  opts.encrypt.encoding = (opts.encrypt.encoding === undefined ? 'buffer' : opts.encrypt.encoding)
+  opts.inputEncoding = (opts.inputEncoding === undefined ? 'buffer' : opts.inputEncoding)
+  opts.encoding = (opts.encoding === undefined ? 'buffer' : opts.encoding)
   var cipher = crypto.createCipher(opts.algorithm, opts.password)
 
-  return createPullCipher(cipher, opts.encrypt)
+  return createPullCipher(cipher, opts)
 }
 
 exports.decipher = function cryptoStreamDecipher(opts) {
   if (!opts.password) throw new Error("Must supply password")
-  if (!opts.decrypt) opts.decrypt = {}
 
   opts.algorithm = opts.algorithm || 'aes-256-cbc'
-  opts.decrypt.inputEncoding = (opts.decrypt.inputEncoding === undefined ? 'buffer' : opts.decrypt.inputEncoding)
-  opts.decrypt.encoding = (opts.decrypt.encoding === undefined ? 'buffer' : opts.decrypt.encoding)
+  opts.inputEncoding = (opts.inputEncoding === undefined ? 'buffer' : opts.inputEncoding)
+  opts.encoding = (opts.encoding === undefined ? 'buffer' : opts.encoding)
   var decipher = crypto.createDecipher(opts.algorithm, opts.password)
 
-  return createPullCipher(decipher, opts.decrypt)
+  return createPullCipher(decipher, opts)
 }

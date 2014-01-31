@@ -3,18 +3,13 @@ var cryptoStreams = require('../index.js'),
   decrypt = cryptoStreams.decrypt,
   pull = require('pull-stream'),
   tape = require('tape'),
-  opts = {
-    password : 'secret',
-    decrypt : {
-      encoding : 'ascii'
-    }
-  };
+  pass = 'secret'
 
 tape('buffer in string out', function(t) {
   t.plan(3)
   pull(
     pull.values([new Buffer('buffer goes in and string comes out')]),
-    encrypt(opts),
+    encrypt({password : pass}),
     pull.collect(function(err, r) {
       if (err) {
         throw new Error(err)
@@ -23,7 +18,10 @@ tape('buffer in string out', function(t) {
       t.equal(Buffer.isBuffer(encrypted), true, "Should receive buffer after encryption")
       pull(
         pull.values([encrypted]),
-        decrypt(opts),
+        decrypt({
+          password : pass,
+          encoding : 'ascii'
+        }),
         pull.collect(function(err, d) {
           if (err) {
             throw err

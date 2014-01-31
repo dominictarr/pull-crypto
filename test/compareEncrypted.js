@@ -5,20 +5,19 @@ var cryptoStreams = require('../index.js'),
   toPull = require('stream-to-pull-stream'),
   tape = require('tape'),
   fs = require('fs'),
-  opts = {
-    password : 'secret'
-  };
+  pass = 'secret',
   thisFile = fs.createReadStream(__filename);
 
 
 
 tape('read file 2 times and collect encrypted text and check it it matches', function(t) {
   var encrypted1, encrypted2
-  // read file encode text collect encrypted text in variable
+
+  // read file --> encrypt text --> collect encrypted text in variable
   pull(
     toPull(thisFile),
-    encrypt(opts),
-    decrypt(opts),
+    encrypt({password : pass}),
+    decrypt({password : pass}),
     pull.collect(function(err, a) {
       if (err) throw err
       encrypted1 = Buffer.concat(a, totalLength(a))
@@ -28,8 +27,8 @@ tape('read file 2 times and collect encrypted text and check it it matches', fun
   thisFile.on('end', function() {
     pull(
       toPull(fs.createReadStream(__filename)),
-      encrypt(opts),
-      decrypt(opts),
+      encrypt({password : pass}),
+      decrypt({password : pass}),
       pull.collect(function(err, b) {
         if (err) throw err
         encrypted2 = Buffer.concat(b, totalLength(b))
