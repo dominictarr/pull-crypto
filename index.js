@@ -1,7 +1,6 @@
 var crypto = require('crypto')
 var pull   = require('pull-stream')
 var cryptoStreams = require('./encryptdecrypt.js')
-var bops = require('bops')
 var encypher = cryptoStreams.encipher
 var decypher = cryptoStreams.decipher
 
@@ -28,8 +27,8 @@ exports.encrypt = function (opts, cb) {
       encypher(opts),
       pull.collect(function (err, ary) {
         if(err) return cb(err)
-        if (bops.is(ary[0])) {
-          cb(null, bops.join(ary))
+        if (Buffer.isBuffer(ary[0])) {
+          cb(null, Buffer.concat(ary))
         } else {
           cb(null, ary)
         }
@@ -44,8 +43,8 @@ exports.decrypt = function (opts, cb) {
       decypher(opts),
       pull.collect(function (err, ary) {
          if(err) return cb(err)
-        if (bops.is(ary[0])) {
-          cb(null, bops.join(ary))
+        if (Buffer.isBuffer(ary[0])) {
+          cb(null, Buffer.concat(ary))
         } else {
           cb(null, ary)
         }

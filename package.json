@@ -1,15 +1,14 @@
 {
   "name": "pull-crypto",
   "description": "crypto via pull-streams",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "homepage": "https://github.com/dominictarr/pull-crypto",
   "repository": {
     "type": "git",
     "url": "git://github.com/dominictarr/pull-crypto.git"
   },
   "dependencies": {
-    "pull-stream": "2",
-    "bops": "~0.1.1"
+    "pull-stream": "2"
   },
   "devDependencies": {
     "tape": "~1.0.2",
