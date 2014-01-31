@@ -1,7 +1,7 @@
 {
   "name": "pull-crypto",
   "description": "crypto via pull-streams",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "homepage": "https://github.com/dominictarr/pull-crypto",
   "repository": {
     "type": "git",
