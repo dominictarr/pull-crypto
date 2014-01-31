@@ -7,25 +7,26 @@ var cryptoStreams = require('../index.js'),
   fs = require('fs'),
   thisFile = fs.createReadStream(__filename),
   writeStream = fs.createWriteStream('./output.txt', {encoding : 'ascii'}),
-  opts = {
-    password : 'secret',
-  };
+  pass = 'secret'
 
 tape('read file then encrypt data write encrypted data to file decrypt encrypted file data', function(t) {
   t.plan(1)
   pull(
     toPull(thisFile),
-    encrypt(opts),
+    encrypt({
+      password : pass
+    }),
     toPull(writeStream)
   )
   writeStream.on('close', function() {
     pull(
       toPull(fs.createReadStream('./output.txt')),
-      decrypt(opts),
+      decrypt({
+        password : pass
+      }),
       pull.collect(function(err, decrypted) {
         if (err) {
-          console.dir(err)
-          throw err.error
+          throw err
         }
         pull(
           toPull(fs.createReadStream(__filename)),

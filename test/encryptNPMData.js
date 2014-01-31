@@ -5,37 +5,31 @@ var cryptoStreams = require('../index.js'),
   toPull = require('stream-to-pull-stream'),
   tape = require('tape'),
   hq = require('hyperquest'),
-  bops = require('bops'),
-  opts = {
-    password : 'secret',
-    encrypt : {
-      encoding : 'hex'
-    },
-    decrypt : {
-      inputEncoding : 'hex',
-      encoding : 'ascii'
-    }
-  },
+  pass = 'secret',
   decrypted,
-  seeThrough = pull.Through(function(read, map) {
-    return function (end, cb) {
-      read(end, function next(end, data) {
-        if (end) return cb(true)
-        map(data)
-        if (end !== true) {
-          read(end, next)
-        }
-      })
+  seeThrough,
+  fin
+  
+seeThrough = pull.Through(function(read, map) {
+  return function (end, cb) {
+    read(end, function next(end, data) {
+      if (end) return cb(true)
+      map(data)
+      if (end !== true) {
+        read(end, next)
+      }
+    })
+  }
+})
+
+fin = curry(function (read, done) {
+  read(null, function next (end, data) {
+    if(end === true) {
+      return done(end === true ? null : end, 'done')
     }
-  }),
-  fin = curry(function (read, done) {
-    read(null, function next (end, data) {
-        if(end === true) {
-          return done(end === true ? null : end, 'done')
-        }
-        read(null, next)
-      })
+    read(null, next)
   })
+})
 
 tape('encrypt and decrypt multi chunk streaming network data source', function(t) {
   pull(
@@ -43,10 +37,16 @@ tape('encrypt and decrypt multi chunk streaming network data source', function(t
     seeThrough(function(data) {
       pull(
         pull.values([data]),
-        encrypt(opts),
-        decrypt(opts),
+        encrypt({
+          password : pass,
+          encoding : 'hex'
+        }),
+        decrypt({
+          password : pass,
+          inputEncoding : 'hex',
+          encoding : 'ascii'
+        }),
         pull.collect(function(end, decrypted) {
-          //decrypted = bops.join(decrypted)
           t.equal(data.toString(), decrypted.join(''), "each chunk received from network should be same after encryption and decryption")
         })
       )
